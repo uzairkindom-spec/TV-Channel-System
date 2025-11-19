@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Z-News DNA Style System</title>
+    <title>Z-News DNA Style System (Animated)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Mukta:wght@400;700;800&display=swap');
 
@@ -20,7 +20,7 @@
             padding: 0;
             background: #111;
             color: white;
-            font-family: 'Mukta', sans-serif; /* Hindi Font */
+            font-family: 'Mukta', sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -31,7 +31,7 @@
         .broadcast-screen {
             position: relative;
             width: 100vw;
-            height: 56.25vw; /* Force 16:9 aspect ratio */
+            height: 56.25vw;
             max-height: 100vh;
             max-width: 177.78vh;
             background: black;
@@ -49,11 +49,11 @@
             z-index: 1;
         }
 
-        /* --- 3. LEFT SIDEBAR (Anchor + Text) --- */
+        /* --- 3. LEFT SIDEBAR (STATIC - NO ANIMATION) --- */
         .sidebar-left {
             position: absolute;
             left: 0;
-            top: 5%; /* Below top ticker */
+            top: 6%; /* Adjusted position */
             bottom: 0;
             width: 22%;
             background: linear-gradient(to right, rgba(0,0,0,0.8), transparent);
@@ -62,23 +62,21 @@
             flex-direction: column;
             gap: 5px;
             padding-left: 10px;
+            padding-top: 10px;
         }
 
-        /* Anchor PIP Box */
         .anchor-box {
             width: 90%;
-            aspect-ratio: 1/1; /* Square box */
+            aspect-ratio: 1/1;
             background: #000;
             border: 3px solid white;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
         }
-        .anchor-video {
-            width: 100%; height: 100%; object-fit: cover;
-        }
+        .anchor-video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* The Red Text Box (Headline) */
+        /* Red Headline Box - STATIC (Ruka hua) */
         .headline-stack {
             width: 90%;
             background: linear-gradient(to bottom, #d32f2f, #8e0000);
@@ -99,14 +97,8 @@
             text-shadow: 2px 2px 0px #000;
             text-transform: uppercase;
         }
-        .stack-sub {
-            font-size: 1.5vw;
-            color: white;
-            font-weight: 700;
-            margin-top: 5px;
-        }
 
-        /* --- 4. TOP BANDS --- */
+        /* --- 4. TOP TICKER (ANIMATED - Chalta hua) --- */
         .top-ticker {
             position: absolute;
             top: 0; left: 0; width: 100%;
@@ -116,28 +108,62 @@
             display: flex;
             align-items: center;
             border-bottom: 2px solid white;
+            overflow: hidden; /* Important for scroll */
         }
+        
+        /* Static Label "Badi Khabar" */
         .ticker-label {
-            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zee_News_logo.svg/1200px-Zee_News_logo.svg.png') no-repeat center;
-            background-size: contain;
-            width: 100px; height: 100%;
-            background-color: white;
-            margin-right: 10px;
+            background: #fff; 
+            padding: 0 15px; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            font-weight: 900; 
+            color: #b70000;
+            font-size: 1.2vw;
+            z-index: 22;
+            box-shadow: 5px 0 10px rgba(0,0,0,0.5);
         }
-        .ticker-text {
-            color: white;
-            font-size: 1.5vw;
-            font-weight: bold;
-            white-space: nowrap;
+
+        /* Scrolling Container */
+        .ticker-container {
             flex: 1;
-            padding-left: 10px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* The Moving Text */
+        .ticker-text {
+            position: absolute;
+            white-space: nowrap;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 1.6vw;
+            font-weight: bold;
+            /* Animation settings */
+            animation: ticker-scroll 20s linear infinite;
+            left: 100%; /* Start from outside right */
+        }
+
+        /* Keyframes for Scrolling */
+        @keyframes ticker-scroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); left: 0; } /* Move to left until fully hidden */
+        }
+        /* Better infinite scroll logic: Start at 100% (right), move to -100% (left) */
+        @keyframes ticker-scroll-true {
+            from { transform: translateX(0%); left: 100%; }
+            to { transform: translateX(-100%); left: 0; }
         }
 
         /* Super Exclusive Tag */
         .super-exclusive {
             position: absolute;
-            top: 6%; /* Below ticker */
-            left: 25%; /* Centerish */
+            top: 6%;
+            left: 25%;
             background: var(--dna-gold);
             color: #b70000;
             padding: 2px 20px;
@@ -151,55 +177,29 @@
             animation: flash 2s infinite;
         }
 
-        /* --- 5. BOTTOM WAVE (The Gold Swoosh) --- */
+        /* --- 5. BOTTOM WAVE --- */
         .bottom-graphics {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 15%;
-            z-index: 15;
-            overflow: hidden;
+            bottom: 0; left: 0; width: 100%; height: 15%; z-index: 15; overflow: hidden;
         }
-        /* Gold Wave Shape */
         .wave-shape {
-            position: absolute;
-            bottom: -20%;
-            left: -10%;
-            width: 120%;
-            height: 100%;
-            background: var(--dna-gold);
-            transform: rotate(-2deg);
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.3);
-            border-top: 3px solid white;
+            position: absolute; bottom: -20%; left: -10%; width: 120%; height: 100%;
+            background: var(--dna-gold); transform: rotate(-2deg);
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.3); border-top: 3px solid white;
         }
         .red-base {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 40%;
-            background: var(--dna-red);
-            z-index: 2;
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+            background: var(--dna-red); z-index: 2;
         }
         
-        /* Logo Watermark */
         .logo-watermark {
-            position: absolute;
-            top: 10%;
-            right: 5%;
-            width: 10vw;
-            opacity: 0.9;
-            z-index: 20;
+            position: absolute; top: 10%; right: 5%; width: 10vw; opacity: 0.9; z-index: 20;
         }
 
         /* --- 6. CONTROLS --- */
         .controls {
-            position: fixed;
-            bottom: 10px; right: 10px;
-            background: #222;
-            padding: 15px;
-            border: 1px solid #444;
-            z-index: 100;
-            width: 300px;
-            border-radius: 8px;
+            position: fixed; bottom: 10px; right: 10px; background: #222;
+            padding: 15px; border: 1px solid #444; z-index: 100; width: 300px; border-radius: 8px;
         }
         .c-grp { margin-bottom: 10px; }
         label { font-size: 0.8rem; color: #aaa; display: block; }
@@ -207,14 +207,7 @@
         button { background: var(--dna-red); color: white; border: none; padding: 5px 10px; cursor: pointer; width: 100%; font-weight: bold; }
         .file-btn { background: #444; margin-top: 5px; }
 
-        @keyframes flash {
-            0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
-        }
-
-        /* Mobile Landscape Hack */
-        @media (max-aspect-ratio: 16/9) {
-            .broadcast-screen { width: 100vw; height: 56.25vw; }
-        }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -222,21 +215,22 @@
     <div class="broadcast-screen">
         
         <div class="top-ticker">
-            <div style="background: #fff; padding: 0 10px; height: 100%; display: flex; align-items: center; font-weight: bold; color: red;">बड़ी ख़बर</div>
-            <div class="ticker-text" id="top-ticker-txt">PAK से भागे 'भाईजान'.. ढूंढे नहीं मिलेंगे 'मुसलमान'</div>
+            <div class="ticker-label">बड़ी ख़बर</div>
+            <div class="ticker-container">
+                <div class="ticker-text" id="scrolling-text">
+                    PAK से भागे 'भाईजान'.. ढूंढे नहीं मिलेंगे 'मुसलमान' ... DNA REPORT ...
+                </div>
+            </div>
         </div>
 
         <div class="super-exclusive" id="exclusive-tag">SUPER EXCLUSIVE</div>
-
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zee_News_logo.svg/1200px-Zee_News_logo.svg.png" class="logo-watermark">
-
         <video class="main-video" id="bg-video" loop muted autoplay></video>
 
         <div class="sidebar-left">
             <div class="anchor-box">
                 <video class="anchor-video" id="anchor-video" loop muted autoplay src=""></video>
-                </div>
-
+            </div>
             <div class="headline-stack">
                 <div class="stack-text" id="box-line-1">40 लाख</div>
                 <div class="stack-text" id="box-line-2">मुसलमानों में</div>
@@ -248,7 +242,6 @@
             <div class="wave-shape"></div>
             <div class="red-base"></div>
         </div>
-
     </div>
 
     <div class="controls">
@@ -264,21 +257,21 @@
         <hr style="border-color:#444">
 
         <div class="c-grp">
-            <label>Top Ticker Text</label>
+            <label>Top Ticker Text (Slides Left)</label>
             <input type="text" id="in-ticker" value="PAK से भागे 'भाईजान'.. ढूंढे नहीं मिलेंगे 'मुसलमान'">
             <button onclick="updateTxt('ticker')">Update Ticker</button>
         </div>
 
         <div class="c-grp">
-            <label>Box Line 1 (Yellow)</label>
+            <label>Box Line 1 (Static/Still)</label>
             <input type="text" id="in-l1" value="40 लाख">
         </div>
         <div class="c-grp">
-            <label>Box Line 2 (Yellow)</label>
+            <label>Box Line 2 (Static/Still)</label>
             <input type="text" id="in-l2" value="मुसलमानों में">
         </div>
         <div class="c-grp">
-            <label>Box Line 3 (White/Big)</label>
+            <label>Box Line 3 (Static/Still)</label>
             <input type="text" id="in-l3" value="'गदर'">
             <button onclick="updateTxt('box')">Update Box</button>
         </div>
@@ -287,32 +280,40 @@
     </div>
 
     <script>
-        // 1. Handle Main Video Upload
+        // 1. Main Video
         document.getElementById('in-bg-vid').addEventListener('change', function(e){
             const file = e.target.files[0];
             if(file){
-                const url = URL.createObjectURL(file);
-                document.getElementById('bg-video').src = url;
+                document.getElementById('bg-video').src = URL.createObjectURL(file);
                 document.getElementById('bg-video').play();
             }
         });
 
-        // 2. Handle Anchor Video Upload
+        // 2. Anchor Video
         document.getElementById('in-anchor-vid').addEventListener('change', function(e){
             const file = e.target.files[0];
             if(file){
-                const url = URL.createObjectURL(file);
-                document.getElementById('anchor-video').src = url;
+                document.getElementById('anchor-video').src = URL.createObjectURL(file);
                 document.getElementById('anchor-video').play();
             }
         });
 
-        // 3. Update Texts
+        // 3. Update Texts with Animation Logic
         function updateTxt(type) {
             if(type === 'ticker') {
-                document.getElementById('top-ticker-txt').innerText = document.getElementById('in-ticker').value;
+                const tickerEl = document.getElementById('scrolling-text');
+                const newText = document.getElementById('in-ticker').value;
+                
+                // Update Text
+                tickerEl.innerText = newText + " ... " + newText; // Repeat for length
+                
+                // RESTART ANIMATION (Trick to make it smooth)
+                tickerEl.style.animation = 'none';
+                tickerEl.offsetHeight; /* Trigger reflow */
+                tickerEl.style.animation = 'ticker-scroll 20s linear infinite';
             } 
             else if (type === 'box') {
+                // These stay static (Still)
                 document.getElementById('box-line-1').innerText = document.getElementById('in-l1').value;
                 document.getElementById('box-line-2').innerText = document.getElementById('in-l2').value;
                 document.getElementById('box-line-3').innerText = document.getElementById('in-l3').value;
