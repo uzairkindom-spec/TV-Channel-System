@@ -2,364 +2,323 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Z-Style Broadcast System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z-News DNA Style System</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Rozha+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Mukta:wght@400;700;800&display=swap');
 
         :root {
-            --z-red: #b71c1c;
-            --z-dark-red: #7f0000;
-            --z-blue: #0d47a1;
-            --text-white: #fff;
+            --dna-red: #b70000;
+            --dna-dark: #580000;
+            --dna-gold: linear-gradient(180deg, #fdd835 0%, #fbc02d 50%, #f57f17 100%);
             --text-yellow: #ffeb3b;
+            --text-white: #fff;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
         body {
-            background: #000;
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: white;
+            font-family: 'Mukta', sans-serif; /* Hindi Font */
             height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- 1. MAIN BROADCAST FRAME (16:9) --- */
+        .broadcast-screen {
+            position: relative;
             width: 100vw;
+            height: 56.25vw; /* Force 16:9 aspect ratio */
+            max-height: 100vh;
+            max-width: 177.78vh;
+            background: black;
+            margin: auto;
             overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            display: flex;
+            border: 1px solid #333;
         }
 
-        /* --- 1. LEFT SIDEBAR (20% Width) --- */
-        .sidebar {
-            width: 20%;
-            height: 100%;
-            background: var(--z-red);
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid rgba(0,0,0,0.2);
+        /* --- 2. VIDEO LAYERS --- */
+        .main-video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* --- 3. LEFT SIDEBAR (Anchor + Text) --- */
+        .sidebar-left {
+            position: absolute;
+            left: 0;
+            top: 5%; /* Below top ticker */
+            bottom: 0;
+            width: 22%;
+            background: linear-gradient(to right, rgba(0,0,0,0.8), transparent);
             z-index: 10;
-        }
-
-        .logo-box {
-            height: 15%;
-            background: linear-gradient(to bottom, #d32f2f, #b71c1c);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        /* Z Logo Simulation */
-        .z-logo {
-            font-family: 'Teko', sans-serif;
-            font-size: 4rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        .z-logo span { font-size: 2rem; font-weight: 400; margin-left: 5px; }
-
-        .live-status {
-            padding: 20px;
-            text-align: center;
-            background: #9b0000;
-        }
-        .live-btn {
-            background: red;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
+            flex-direction: column;
             gap: 5px;
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(255,0,0,0.5);
+            padding-left: 10px;
         }
 
-        .ads-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            font-family: 'Teko', sans-serif;
-            font-size: 2rem;
-            line-height: 1.2;
-            text-align: center;
-            background: rgba(0,0,0,0.1);
-            padding: 10px;
-        }
-        .ads-area span { color: #ffcdd2; font-size: 1.2rem; }
-
-        .bottom-logo {
-            height: 15%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #8e0000;
-        }
-
-        /* --- 2. VIDEO AREA (Top Right 80%) --- */
-        .content-area {
-            width: 80%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .video-frame {
-            flex: 1; /* Takes up remaining height */
-            position: relative;
+        /* Anchor PIP Box */
+        .anchor-box {
+            width: 90%;
+            aspect-ratio: 1/1; /* Square box */
             background: #000;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: relative;
             overflow: hidden;
         }
-        video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Overlays inside Video */
-        .top-bug {
-            position: absolute;
-            top: 40%; /* Based on image */
-            left: 20px;
-            z-index: 5;
+        .anchor-video {
+            width: 100%; height: 100%; object-fit: cover;
         }
-        .bug-box {
-            background: white;
-            color: var(--z-red);
-            font-weight: 900;
-            padding: 5px 10px;
-            font-size: 1.5rem;
+
+        /* The Red Text Box (Headline) */
+        .headline-stack {
+            width: 90%;
+            background: linear-gradient(to bottom, #d32f2f, #8e0000);
+            border: 2px solid #ffcdd2;
+            padding: 10px 5px;
             text-align: center;
-            border-radius: 5px;
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
-            display: inline-block;
-        }
-        .bug-blue {
-            background: linear-gradient(to right, #2196f3, #0d47a1);
-            color: white;
-            padding: 2px 15px;
-            font-size: 1.2rem;
-            margin-top: -5px;
-            margin-left: 10px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-
-        /* --- 3. BOTTOM BANDS (Graphics) --- */
-        .graphics-stack {
-            height: 30%; /* Approx height of bottom area */
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-        }
-
-        /* White Headline Strip */
-        .strip-white {
-            height: 35%;
-            background: white;
-            display: flex;
-            align-items: center;
-            padding-left: 20px;
-            position: relative;
-            border-bottom: 4px solid #e91e63; /* Pink line from image */
-        }
-        .headline-main {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: black;
-            font-family: sans-serif;
-            width: 90%;
-        }
-        .number-box {
-            position: absolute;
-            right: 50px;
-            top: -10px;
-            background: #b71c1c;
-            color: white;
-            width: 60px;
-            height: 60px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
-            z-index: 6;
+            min-height: 150px;
         }
-
-        /* Red/Blue Breaking Strip */
-        .strip-red {
-            height: 35%;
-            background: linear-gradient(90deg, var(--z-blue) 15%, var(--z-red) 30%);
-            display: flex;
-            align-items: center;
+        .stack-text {
+            font-size: 2vw;
+            line-height: 1.1;
+            font-weight: 800;
+            color: var(--text-yellow);
+            text-shadow: 2px 2px 0px #000;
+            text-transform: uppercase;
+        }
+        .stack-sub {
+            font-size: 1.5vw;
             color: white;
-            padding-left: 50px;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%); /* Slant effect */
-            margin-left: -20px; /* Pull left to cover corner */
-        }
-        .breaking-text {
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px black;
+            font-weight: 700;
+            margin-top: 5px;
         }
 
-        /* Footer (Channel Info & Anchors) */
-        .footer-strip {
-            height: 30%;
-            background: var(--z-red);
+        /* --- 4. TOP BANDS --- */
+        .top-ticker {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            height: 6%;
+            background: linear-gradient(90deg, #8e0000, #d32f2f);
+            z-index: 20;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            border-top: 2px solid #ff5252;
+            border-bottom: 2px solid white;
         }
-        .channel-info {
-            background: white;
-            color: black;
-            padding: 5px 10px;
-            border-radius: 4px;
+        .ticker-label {
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zee_News_logo.svg/1200px-Zee_News_logo.svg.png') no-repeat center;
+            background-size: contain;
+            width: 100px; height: 100%;
+            background-color: white;
+            margin-right: 10px;
+        }
+        .ticker-text {
+            color: white;
+            font-size: 1.5vw;
             font-weight: bold;
-            border: 2px solid #fbc02d;
-        }
-        .anchors-img {
-            height: 90%;
-            display: flex;
-            gap: 5px;
-        }
-        .anchor-ph {
-            height: 100%;
-            width: 50px;
-            background: #555;
-            border: 1px solid white;
-            background-image: url('https://via.placeholder.com/50x60?text=News');
-            background-size: cover;
+            white-space: nowrap;
+            flex: 1;
+            padding-left: 10px;
         }
 
-        /* --- CONTROL PANEL (Overlay) --- */
+        /* Super Exclusive Tag */
+        .super-exclusive {
+            position: absolute;
+            top: 6%; /* Below ticker */
+            left: 25%; /* Centerish */
+            background: var(--dna-gold);
+            color: #b70000;
+            padding: 2px 20px;
+            font-size: 1.8vw;
+            font-weight: 900;
+            font-family: 'Teko', sans-serif;
+            border: 2px solid white;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            z-index: 25;
+            text-transform: uppercase;
+            animation: flash 2s infinite;
+        }
+
+        /* --- 5. BOTTOM WAVE (The Gold Swoosh) --- */
+        .bottom-graphics {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15%;
+            z-index: 15;
+            overflow: hidden;
+        }
+        /* Gold Wave Shape */
+        .wave-shape {
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: var(--dna-gold);
+            transform: rotate(-2deg);
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.3);
+            border-top: 3px solid white;
+        }
+        .red-base {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 40%;
+            background: var(--dna-red);
+            z-index: 2;
+        }
+        
+        /* Logo Watermark */
+        .logo-watermark {
+            position: absolute;
+            top: 10%;
+            right: 5%;
+            width: 10vw;
+            opacity: 0.9;
+            z-index: 20;
+        }
+
+        /* --- 6. CONTROLS --- */
         .controls {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
+            bottom: 10px; right: 10px;
+            background: #222;
+            padding: 15px;
+            border: 1px solid #444;
             z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            width: 250px;
+            width: 300px;
+            border-radius: 8px;
         }
-        .controls.hidden { display: none; }
-        .btn { cursor: pointer; padding: 5px; background: #444; color: white; border: 1px solid #666; }
-        input { width: 100%; padding: 5px; }
-        .toggle-btn {
-            position: fixed; top:0; right:0; z-index: 101; width: 20px; height: 20px; background: red; cursor: pointer;
+        .c-grp { margin-bottom: 10px; }
+        label { font-size: 0.8rem; color: #aaa; display: block; }
+        input[type="text"] { width: 100%; padding: 5px; background: #000; border: 1px solid #555; color: white; margin-bottom: 5px; }
+        button { background: var(--dna-red); color: white; border: none; padding: 5px 10px; cursor: pointer; width: 100%; font-weight: bold; }
+        .file-btn { background: #444; margin-top: 5px; }
+
+        @keyframes flash {
+            0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
         }
 
+        /* Mobile Landscape Hack */
+        @media (max-aspect-ratio: 16/9) {
+            .broadcast-screen { width: 100vw; height: 56.25vw; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="toggle-btn" onclick="document.querySelector('.controls').classList.toggle('hidden')"></div>
+    <div class="broadcast-screen">
+        
+        <div class="top-ticker">
+            <div style="background: #fff; padding: 0 10px; height: 100%; display: flex; align-items: center; font-weight: bold; color: red;">बड़ी ख़बर</div>
+            <div class="ticker-text" id="top-ticker-txt">PAK से भागे 'भाईजान'.. ढूंढे नहीं मिलेंगे 'मुसलमान'</div>
+        </div>
+
+        <div class="super-exclusive" id="exclusive-tag">SUPER EXCLUSIVE</div>
+
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Zee_News_logo.svg/1200px-Zee_News_logo.svg.png" class="logo-watermark">
+
+        <video class="main-video" id="bg-video" loop muted autoplay></video>
+
+        <div class="sidebar-left">
+            <div class="anchor-box">
+                <video class="anchor-video" id="anchor-video" loop muted autoplay src=""></video>
+                </div>
+
+            <div class="headline-stack">
+                <div class="stack-text" id="box-line-1">40 लाख</div>
+                <div class="stack-text" id="box-line-2">मुसलमानों में</div>
+                <div class="stack-text" style="color:white; font-size: 2.5vw;" id="box-line-3">'गदर'</div>
+            </div>
+        </div>
+
+        <div class="bottom-graphics">
+            <div class="wave-shape"></div>
+            <div class="red-base"></div>
+        </div>
+
+    </div>
 
     <div class="controls">
-        <h3>System Controls</h3>
+        <div class="c-grp">
+            <label>Main Background Video</label>
+            <input type="file" id="in-bg-vid" class="file-btn" accept="video/*">
+        </div>
+        <div class="c-grp">
+            <label>Anchor/Left Video</label>
+            <input type="file" id="in-anchor-vid" class="file-btn" accept="video/*">
+        </div>
         
-        <label>Upload Video:</label>
-        <input type="file" id="vidInput" accept="video/*">
+        <hr style="border-color:#444">
+
+        <div class="c-grp">
+            <label>Top Ticker Text</label>
+            <input type="text" id="in-ticker" value="PAK से भागे 'भाईजान'.. ढूंढे नहीं मिलेंगे 'मुसलमान'">
+            <button onclick="updateTxt('ticker')">Update Ticker</button>
+        </div>
+
+        <div class="c-grp">
+            <label>Box Line 1 (Yellow)</label>
+            <input type="text" id="in-l1" value="40 लाख">
+        </div>
+        <div class="c-grp">
+            <label>Box Line 2 (Yellow)</label>
+            <input type="text" id="in-l2" value="मुसलमानों में">
+        </div>
+        <div class="c-grp">
+            <label>Box Line 3 (White/Big)</label>
+            <input type="text" id="in-l3" value="'गदर'">
+            <button onclick="updateTxt('box')">Update Box</button>
+        </div>
         
-        <label>Main Headline (White):</label>
-        <input type="text" id="inp-main" value="कई इलाकों में यातायात पर असर">
-        <button class="btn" onclick="updateTxt('main')">Update Headline</button>
-        
-        <label>Breaking Line (Red):</label>
-        <input type="text" id="inp-break" value="तबलीगी जमात से शाहीन को फंडिंग हुई थी">
-        <button class="btn" onclick="updateTxt('break')">Update Breaking</button>
-
-        <label>Top Bug Text:</label>
-        <input type="text" id="inp-bug" value="मौसम">
-        <button class="btn" onclick="updateTxt('bug')">Update Bug</button>
-    </div>
-
-    <div class="sidebar">
-        <div class="logo-box">
-            <div class="z-logo">Z <span>NEWS</span></div>
-        </div>
-        <div class="live-status">
-            <div class="live-btn">▶ LIVE ON</div>
-            <div style="color:white; margin-top:5px; font-size:0.8rem;">LG Channels</div>
-        </div>
-        <div class="ads-area">
-            MOST<br>TRUSTED,<br>MOST<br>RELIABLE
-        </div>
-        <div class="bottom-logo">
-            <div class="z-logo" style="font-size: 2.5rem;">Z <span>NEWS</span></div>
-        </div>
-    </div>
-
-    <div class="content-area">
-        
-        <div class="video-frame">
-            <video id="mainPlayer" autoplay loop muted>
-                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            </video>
-
-            <div class="top-bug">
-                <div class="bug-box">T<span style="background:red; color:white; border-radius:50%; padding:0 5px;">2</span>P</div>
-                <div class="bug-blue" id="bug-text">मौसम</div>
-                <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #0d47a1; margin-left: 20px;"></div>
-            </div>
-        </div>
-
-        <div class="graphics-stack">
-            
-            <div class="strip-white">
-                <div class="headline-main" id="txt-main">कई इलाकों में यातायात पर असर</div>
-                <div class="number-box">5</div>
-            </div>
-
-            <div class="strip-red">
-                <div class="breaking-text" id="txt-break">तबलीगी जमात से शाहीन को फंडिंग हुई थी</div>
-            </div>
-
-            <div class="footer-strip">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="color:white; font-size:0.8rem;">Channel No.</span>
-                    <div class="channel-info">IP-118</div>
-                </div>
-                <div class="anchors-img">
-                    <div class="anchor-ph" style="background: #333;"></div>
-                    <div class="anchor-ph" style="background: #444;"></div>
-                    <div class="anchor-ph" style="background: #555;"></div>
-                    <div class="anchor-ph" style="background: #666;"></div>
-                </div>
-            </div>
-
-        </div>
+        <button onclick="document.querySelector('.controls').style.display='none'" style="background:#333; margin-top:10px;">Hide Controls</button>
     </div>
 
     <script>
-        // Video Upload
-        document.getElementById('vidInput').addEventListener('change', function(e) {
+        // 1. Handle Main Video Upload
+        document.getElementById('in-bg-vid').addEventListener('change', function(e){
             const file = e.target.files[0];
-            if (file) {
+            if(file){
                 const url = URL.createObjectURL(file);
-                const vid = document.getElementById('mainPlayer');
-                vid.src = url;
-                vid.play();
+                document.getElementById('bg-video').src = url;
+                document.getElementById('bg-video').play();
             }
         });
 
-        // Text Updates
+        // 2. Handle Anchor Video Upload
+        document.getElementById('in-anchor-vid').addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if(file){
+                const url = URL.createObjectURL(file);
+                document.getElementById('anchor-video').src = url;
+                document.getElementById('anchor-video').play();
+            }
+        });
+
+        // 3. Update Texts
         function updateTxt(type) {
-            if(type === 'main') {
-                document.getElementById('txt-main').innerText = document.getElementById('inp-main').value;
-            } else if(type === 'break') {
-                document.getElementById('txt-break').innerText = document.getElementById('inp-break').value;
-            } else if(type === 'bug') {
-                document.getElementById('bug-text').innerText = document.getElementById('inp-bug').value;
+            if(type === 'ticker') {
+                document.getElementById('top-ticker-txt').innerText = document.getElementById('in-ticker').value;
+            } 
+            else if (type === 'box') {
+                document.getElementById('box-line-1').innerText = document.getElementById('in-l1').value;
+                document.getElementById('box-line-2').innerText = document.getElementById('in-l2').value;
+                document.getElementById('box-line-3').innerText = document.getElementById('in-l3').value;
             }
         }
     </script>
+
 </body>
 </html>
