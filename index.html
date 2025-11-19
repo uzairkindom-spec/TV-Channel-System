@@ -3,410 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TV Master Control - 8 Cam Broadcast</title>
+    <title>Z-Style Broadcast System</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Rozha+One&display=swap');
+
         :root {
-            --bg: #0e0e10;
-            --panel: #18181b;
-            --border: #2d2d30;
-            --accent: #e53935; /* Live Red */
-            --highlight: #00e676; /* Good Green */
-            --text: #efeff1;
-            --cam-bg: #000;
+            --z-red: #b71c1c;
+            --z-dark-red: #7f0000;
+            --z-blue: #0d47a1;
+            --text-white: #fff;
+            --text-yellow: #ffeb3b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background: #000;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            width: 100vw;
             overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            display: flex;
         }
 
-        /* --- Header --- */
-        header {
-            height: 50px;
-            background: var(--panel);
-            border-bottom: 1px solid var(--border);
+        /* --- 1. LEFT SIDEBAR (20% Width) --- */
+        .sidebar {
+            width: 20%;
+            height: 100%;
+            background: var(--z-red);
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .logo-box {
+            height: 15%;
+            background: linear-gradient(to bottom, #d32f2f, #b71c1c);
             display: flex;
             align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        /* Z Logo Simulation */
+        .z-logo {
+            font-family: 'Teko', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .z-logo span { font-size: 2rem; font-weight: 400; margin-left: 5px; }
+
+        .live-status {
+            padding: 20px;
+            text-align: center;
+            background: #9b0000;
+        }
+        .live-btn {
+            background: red;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255,0,0,0.5);
+        }
+
+        .ads-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-family: 'Teko', sans-serif;
+            font-size: 2rem;
+            line-height: 1.2;
+            text-align: center;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+        .ads-area span { color: #ffcdd2; font-size: 1.2rem; }
+
+        .bottom-logo {
+            height: 15%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #8e0000;
+        }
+
+        /* --- 2. VIDEO AREA (Top Right 80%) --- */
+        .content-area {
+            width: 80%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-frame {
+            flex: 1; /* Takes up remaining height */
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Overlays inside Video */
+        .top-bug {
+            position: absolute;
+            top: 40%; /* Based on image */
+            left: 20px;
+            z-index: 5;
+        }
+        .bug-box {
+            background: white;
+            color: var(--z-red);
+            font-weight: 900;
+            padding: 5px 10px;
+            font-size: 1.5rem;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.5);
+            display: inline-block;
+        }
+        .bug-blue {
+            background: linear-gradient(to right, #2196f3, #0d47a1);
+            color: white;
+            padding: 2px 15px;
+            font-size: 1.2rem;
+            margin-top: -5px;
+            margin-left: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* --- 3. BOTTOM BANDS (Graphics) --- */
+        .graphics-stack {
+            height: 30%; /* Approx height of bottom area */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* White Headline Strip */
+        .strip-white {
+            height: 35%;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            position: relative;
+            border-bottom: 4px solid #e91e63; /* Pink line from image */
+        }
+        .headline-main {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: black;
+            font-family: sans-serif;
+            width: 90%;
+        }
+        .number-box {
+            position: absolute;
+            right: 50px;
+            top: -10px;
+            background: #b71c1c;
+            color: white;
+            width: 60px;
+            height: 60px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
+            z-index: 6;
+        }
+
+        /* Red/Blue Breaking Strip */
+        .strip-red {
+            height: 35%;
+            background: linear-gradient(90deg, var(--z-blue) 15%, var(--z-red) 30%);
+            display: flex;
+            align-items: center;
+            color: white;
+            padding-left: 50px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%); /* Slant effect */
+            margin-left: -20px; /* Pull left to cover corner */
+        }
+        .breaking-text {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        /* Footer (Channel Info & Anchors) */
+        .footer-strip {
+            height: 30%;
+            background: var(--z-red);
+            display: flex;
             justify-content: space-between;
-            padding: 0 20px;
-        }
-        .brand { font-weight: 900; letter-spacing: 1px; color: #fff; }
-        .brand span { color: var(--accent); }
-        
-        .sys-info { display: flex; gap: 20px; font-size: 0.8rem; font-family: monospace; color: #888; }
-        .stat span { color: var(--highlight); }
-        
-        .clock { font-size: 1.5rem; font-weight: bold; font-family: monospace; color: #fff; }
-
-        /* --- Main Workspace --- */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 300px 1fr 300px; /* Left - Center - Right */
-            flex: 1;
-            height: calc(100% - 80px); /* Minus header & ticker */
-            gap: 2px;
-            background: var(--border);
-        }
-
-        /* Panel Styling */
-        .panel { background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
-        .p-header {
-            padding: 8px 10px; background: #222; font-size: 0.75rem;
-            font-weight: bold; text-transform: uppercase; color: #aaa;
-            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
-        }
-
-        /* --- LEFT: Multiviewer (8 Cams) --- */
-        .multiviewer {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 columns */
-            grid-auto-rows: 1fr;
-            gap: 2px;
-            background: var(--border);
-            overflow-y: auto;
-        }
-        .cam-box {
-            background: #050505;
-            position: relative;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            border: 1px solid #222;
-            min-height: 100px;
+            padding: 0 20px;
+            border-top: 2px solid #ff5252;
         }
-        .cam-label {
-            position: absolute; top: 5px; left: 5px;
-            background: rgba(0,0,0,0.7); padding: 2px 4px;
-            font-size: 0.6rem; color: #fff; border-left: 2px solid var(--highlight);
+        .channel-info {
+            background: white;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            border: 2px solid #fbc02d;
         }
-        .cam-signal { color: #333; font-size: 1.5rem; font-weight: 900; opacity: 0.5; }
-        /* Animation for fake activity */
-        .cam-box::after {
-            content: ''; position: absolute; bottom: 5px; right: 5px;
-            width: 8px; height: 8px; background: var(--highlight);
-            border-radius: 50%; animation: blink 2s infinite;
+        .anchors-img {
+            height: 90%;
+            display: flex;
+            gap: 5px;
+        }
+        .anchor-ph {
+            height: 100%;
+            width: 50px;
+            background: #555;
+            border: 1px solid white;
+            background-image: url('https://via.placeholder.com/50x60?text=News');
+            background-size: cover;
         }
 
-        /* --- CENTER: Program Monitor --- */
-        .pgm-area {
-            background: #000;
+        /* --- CONTROL PANEL (Overlay) --- */
+        .controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            position: relative;
-            border-left: 2px solid var(--border);
-            border-right: 2px solid var(--border);
+            gap: 5px;
+            width: 250px;
         }
-        
-        .monitor-screen {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            overflow: hidden;
-        }
-        
-        /* Media Elements */
-        video, img { width: 100%; height: 100%; object-fit: contain; }
-        
-        /* Overlays */
-        .live-tag {
-            position: absolute; top: 20px; right: 20px;
-            background: var(--accent); color: white;
-            padding: 5px 10px; font-weight: bold; border-radius: 3px;
-            box-shadow: 0 0 10px var(--accent);
-            animation: pulse 1.5s infinite;
-            display: none; z-index: 10;
+        .controls.hidden { display: none; }
+        .btn { cursor: pointer; padding: 5px; background: #444; color: white; border: 1px solid #666; }
+        input { width: 100%; padding: 5px; }
+        .toggle-btn {
+            position: fixed; top:0; right:0; z-index: 101; width: 20px; height: 20px; background: red; cursor: pointer;
         }
 
-        .cg-overlay {
-            position: absolute; bottom: 10%; left: 5%; right: 5%;
-            display: none; z-index: 9;
-        }
-        .cg-box { background: linear-gradient(90deg, #b71c1c, #f44336); padding: 10px 20px; color: white; font-size: 1.5rem; font-weight: bold; display: inline-block; box-shadow: 3px 3px 5px rgba(0,0,0,0.5); }
-        .cg-sub { background: rgba(255,255,255,0.9); color: black; padding: 5px 20px; font-weight: bold; display: inline-block; margin-top: 2px; }
-
-        /* Audio Meters (Visual) */
-        .audio-deck { height: 60px; background: #111; display: flex; gap: 5px; padding: 10px; align-items: flex-end; justify-content: center; border-top: 1px solid #333; }
-        .meter { width: 15px; background: #333; height: 100%; position: relative; }
-        .level { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, #00e676, #ffea00, #ff1744); transition: height 0.1s; }
-
-        /* --- RIGHT: Controls --- */
-        .controls-area { padding: 10px; gap: 10px; overflow-y: auto; }
-        
-        .section-box { background: #1f1f23; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
-        .lbl { color: #888; font-size: 0.7rem; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        
-        .playlist { min-height: 150px; max-height: 250px; overflow-y: auto; background: #111; border: 1px solid #333; margin-bottom: 10px; }
-        .p-item { padding: 8px; border-bottom: 1px solid #222; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; }
-        .p-item:hover { background: #222; }
-        .p-item.active { background: #3a1010; border-left: 3px solid var(--accent); color: white; }
-
-        /* Buttons */
-        button { width: 100%; padding: 10px; border: none; border-radius: 3px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
-        .btn-take { background: var(--accent); font-size: 1.1rem; height: 50px; margin-bottom: 10px; }
-        .btn-take:active { background: #b71c1c; transform: scale(0.98); }
-        
-        .btn-add { background: #333; font-size: 0.8rem; border: 1px dashed #555; color: #aaa; }
-        .btn-add:hover { border-color: #fff; color: #fff; }
-        
-        .btn-opt { background: #444; font-size: 0.8rem; margin-bottom: 5px; }
-        .btn-opt.active { background: var(--highlight); color: black; }
-
-        input[type="text"] { width: 100%; background: #111; border: 1px solid #444; color: white; padding: 6px; font-size: 0.85rem; margin-bottom: 5px; }
-
-        /* --- Footer Ticker --- */
-        .ticker { height: 30px; background: var(--accent); display: flex; align-items: center; overflow: hidden; white-space: nowrap; }
-        .ticker-lbl { background: black; color: yellow; padding: 0 15px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 0.8rem; z-index: 5; }
-        .ticker-content { padding-left: 100%; animation: scroll 20s linear infinite; font-weight: bold; font-size: 0.9rem; display: inline-block; }
-
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            .main-grid { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
-            .multiviewer { display: none; /* Hide 8 cams on small mobile to save space */ }
-            .pgm-area { height: 40vh; }
-        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">MASTER <span>CONTROL</span></div>
-        <div class="sys-info">
-            <div class="stat">STREAM: <span>1080p60</span></div>
-            <div class="stat">BITRATE: <span>6000 Kbps</span></div>
-        </div>
-        <div class="clock" id="clock">00:00:00</div>
-    </header>
+    <div class="toggle-btn" onclick="document.querySelector('.controls').classList.toggle('hidden')"></div>
 
-    <div class="main-grid">
+    <div class="controls">
+        <h3>System Controls</h3>
         
-        <div class="panel" style="border-right: 1px solid #333;">
-            <div class="p-header">Multiviewer (Inputs)</div>
-            <div class="multiviewer">
-                <div class="cam-box"><div class="cam-label">CAM 1 (STUDIO)</div><div class="cam-signal">CAM 1</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 2 (NEWS)</div><div class="cam-signal">CAM 2</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 3 (REMOTE)</div><div class="cam-signal">CAM 3</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 4 (SAT)</div><div class="cam-signal">CAM 4</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 5 (SAT)</div><div class="cam-signal">CAM 5</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 6 (EXT)</div><div class="cam-signal">CAM 6</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 7 (GFX)</div><div class="cam-signal">GFX A</div></div>
-                <div class="cam-box"><div class="cam-label">CAM 8 (GFX)</div><div class="cam-signal">GFX B</div></div>
-            </div>
-        </div>
+        <label>Upload Video:</label>
+        <input type="file" id="vidInput" accept="video/*">
+        
+        <label>Main Headline (White):</label>
+        <input type="text" id="inp-main" value="कई इलाकों में यातायात पर असर">
+        <button class="btn" onclick="updateTxt('main')">Update Headline</button>
+        
+        <label>Breaking Line (Red):</label>
+        <input type="text" id="inp-break" value="तबलीगी जमात से शाहीन को फंडिंग हुई थी">
+        <button class="btn" onclick="updateTxt('break')">Update Breaking</button>
 
-        <div class="panel pgm-area">
-            <div class="p-header">
-                <span>PROGRAM (AIR)</span>
-                <span style="color:var(--accent)">● LIVE TRANSMISSION</span>
-            </div>
-            <div class="monitor-screen" id="screen">
-                <div class="live-tag" id="live-bug">LIVE</div>
-                
-                <video id="main-video" style="display:none"></video>
-                <img id="main-image" style="display:none" src="">
-                <h2 id="idle-text" style="color:#333">SYSTEM IDLE</h2>
-
-                <div class="cg-overlay" id="cg-layer">
-                    <div class="cg-box" id="cg-head">BREAKING NEWS</div><br>
-                    <div class="cg-sub" id="cg-sub">Developing Story</div>
-                </div>
-            </div>
-
-            <div class="audio-deck">
-                <div class="meter"><div class="level" id="m1"></div></div>
-                <div class="meter"><div class="level" id="m2"></div></div>
-                <div class="meter"><div class="level" id="m3"></div></div>
-                <div class="meter"><div class="level" id="m4"></div></div>
-                <span style="color:#555; font-size:0.7rem; margin-left:10px; margin-bottom:5px;">AUDIO MIX</span>
-            </div>
-        </div>
-
-        <div class="panel controls-area">
-            
-            <div class="section-box">
-                <button class="btn-take" onclick="playNext()">TAKE (PLAY)</button>
-                <button class="btn-opt" style="background:#333;" onclick="stopAll()">FADE TO BLACK</button>
-            </div>
-
-            <div class="section-box">
-                <span class="lbl">PLAYLIST / ASSETS</span>
-                <div class="playlist" id="playlist-container">
-                    </div>
-                <input type="file" id="fileInput" multiple accept="video/*,image/*" style="display:none">
-                <button class="btn-add" onclick="document.getElementById('fileInput').click()">+ UPLOAD MEDIA</button>
-            </div>
-
-            <div class="section-box">
-                <span class="lbl">CG / LOWER THIRD</span>
-                <input type="text" id="inp-head" value="BREAKING NEWS">
-                <input type="text" id="inp-sub" value="Live Report">
-                <div style="display:flex; gap:5px;">
-                    <button class="btn-opt" onclick="updateCG()">UPDATE</button>
-                    <button class="btn-opt" id="btn-cg" onclick="toggleCG()">SHOW ON AIR</button>
-                </div>
-            </div>
-
-            <div class="section-box">
-                <span class="lbl">TICKER CONTENT</span>
-                <input type="text" id="inp-ticker" value="WELCOME TO THE BROADCAST SYSTEM...">
-                <button class="btn-opt" onclick="updateTicker()">UPDATE TICKER</button>
-            </div>
-
-        </div>
-
+        <label>Top Bug Text:</label>
+        <input type="text" id="inp-bug" value="मौसम">
+        <button class="btn" onclick="updateTxt('bug')">Update Bug</button>
     </div>
 
-    <div class="ticker">
-        <div class="ticker-lbl">NEWS FLASH</div>
-        <div class="ticker-content" id="ticker-text">SYSTEM READY - CONNECTING TO SATELLITE - STANDBY FOR UPLOAD...</div>
+    <div class="sidebar">
+        <div class="logo-box">
+            <div class="z-logo">Z <span>NEWS</span></div>
+        </div>
+        <div class="live-status">
+            <div class="live-btn">▶ LIVE ON</div>
+            <div style="color:white; margin-top:5px; font-size:0.8rem;">LG Channels</div>
+        </div>
+        <div class="ads-area">
+            MOST<br>TRUSTED,<br>MOST<br>RELIABLE
+        </div>
+        <div class="bottom-logo">
+            <div class="z-logo" style="font-size: 2.5rem;">Z <span>NEWS</span></div>
+        </div>
+    </div>
+
+    <div class="content-area">
+        
+        <div class="video-frame">
+            <video id="mainPlayer" autoplay loop muted>
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
+
+            <div class="top-bug">
+                <div class="bug-box">T<span style="background:red; color:white; border-radius:50%; padding:0 5px;">2</span>P</div>
+                <div class="bug-blue" id="bug-text">मौसम</div>
+                <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #0d47a1; margin-left: 20px;"></div>
+            </div>
+        </div>
+
+        <div class="graphics-stack">
+            
+            <div class="strip-white">
+                <div class="headline-main" id="txt-main">कई इलाकों में यातायात पर असर</div>
+                <div class="number-box">5</div>
+            </div>
+
+            <div class="strip-red">
+                <div class="breaking-text" id="txt-break">तबलीगी जमात से शाहीन को फंडिंग हुई थी</div>
+            </div>
+
+            <div class="footer-strip">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="color:white; font-size:0.8rem;">Channel No.</span>
+                    <div class="channel-info">IP-118</div>
+                </div>
+                <div class="anchors-img">
+                    <div class="anchor-ph" style="background: #333;"></div>
+                    <div class="anchor-ph" style="background: #444;"></div>
+                    <div class="anchor-ph" style="background: #555;"></div>
+                    <div class="anchor-ph" style="background: #666;"></div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
-        // --- Logic ---
-        let playlist = [];
-        let currentIndex = -1;
-        const videoPlayer = document.getElementById('main-video');
-        const imageViewer = document.getElementById('main-image');
-        const idleText = document.getElementById('idle-text');
-        const liveBug = document.getElementById('live-bug');
-
-        // 1. Clock
-        setInterval(() => {
-            const d = new Date();
-            document.getElementById('clock').innerText = d.toLocaleTimeString('en-GB');
-        }, 1000);
-
-        // 2. Audio Meter Simulation
-        setInterval(() => {
-            if(videoPlayer.style.display === 'block' && !videoPlayer.paused) {
-                // Random levels when video is playing
-                document.getElementById('m1').style.height = Math.random() * 100 + '%';
-                document.getElementById('m2').style.height = Math.random() * 100 + '%';
-                document.getElementById('m3').style.height = Math.random() * 80 + '%';
-                document.getElementById('m4').style.height = Math.random() * 80 + '%';
-            } else {
-                // Silence
-                document.querySelectorAll('.level').forEach(el => el.style.height = '5%');
+        // Video Upload
+        document.getElementById('vidInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                const vid = document.getElementById('mainPlayer');
+                vid.src = url;
+                vid.play();
             }
-        }, 100);
-
-        // 3. File Upload
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                const type = file.type.startsWith('video') ? 'video' : 'image';
-                playlist.push({
-                    id: Date.now() + Math.random(),
-                    name: file.name,
-                    type: type,
-                    url: URL.createObjectURL(file)
-                });
-            });
-            renderPlaylist();
         });
 
-        // 4. Render Playlist
-        function renderPlaylist() {
-            const con = document.getElementById('playlist-container');
-            con.innerHTML = '';
-            playlist.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = `p-item ${index === currentIndex ? 'active' : ''}`;
-                div.innerHTML = `<span>${index+1}. ${item.name}</span> <span style="font-size:0.7rem; opacity:0.5">${item.type.toUpperCase()}</span>`;
-                div.onclick = () => { currentIndex = index - 1; playNext(); };
-                
-                // Add delete button logic here if needed
-                con.appendChild(div);
-            });
-        }
-
-        // 5. Play Logic
-        function playNext() {
-            if (currentIndex < playlist.length - 1) {
-                currentIndex++;
-                const item = playlist[currentIndex];
-                
-                idleText.style.display = 'none';
-                liveBug.style.display = 'block';
-                
-                renderPlaylist(); // update active class
-
-                if (item.type === 'video') {
-                    imageViewer.style.display = 'none';
-                    videoPlayer.style.display = 'block';
-                    videoPlayer.src = item.url;
-                    videoPlayer.play();
-                    
-                    videoPlayer.onended = () => playNext(); // Auto Next
-                } else {
-                    videoPlayer.pause();
-                    videoPlayer.style.display = 'none';
-                    imageViewer.style.display = 'block';
-                    imageViewer.src = item.url;
-                    
-                    // Image stays for 5 seconds then next
-                    setTimeout(() => {
-                        if(imageViewer.src === item.url) playNext();
-                    }, 5000);
-                }
-            } else {
-                stopAll();
+        // Text Updates
+        function updateTxt(type) {
+            if(type === 'main') {
+                document.getElementById('txt-main').innerText = document.getElementById('inp-main').value;
+            } else if(type === 'break') {
+                document.getElementById('txt-break').innerText = document.getElementById('inp-break').value;
+            } else if(type === 'bug') {
+                document.getElementById('bug-text').innerText = document.getElementById('inp-bug').value;
             }
         }
-
-        function stopAll() {
-            videoPlayer.pause();
-            videoPlayer.style.display = 'none';
-            imageViewer.style.display = 'none';
-            idleText.style.display = 'block';
-            liveBug.style.display = 'none';
-            currentIndex = -1;
-            renderPlaylist();
-        }
-
-        // 6. CG & Ticker Logic
-        let cgOn = false;
-        function toggleCG() {
-            const layer = document.getElementById('cg-layer');
-            const btn = document.getElementById('btn-cg');
-            cgOn = !cgOn;
-            if(cgOn) {
-                layer.style.display = 'block';
-                btn.classList.add('active');
-            } else {
-                layer.style.display = 'none';
-                btn.classList.remove('active');
-            }
-        }
-
-        function updateCG() {
-            document.getElementById('cg-head').innerText = document.getElementById('inp-head').value;
-            document.getElementById('cg-sub').innerText = document.getElementById('inp-sub').value;
-        }
-
-        function updateTicker() {
-            const txt = document.getElementById('inp-ticker').value;
-            // Restart animation trick
-            const t = document.getElementById('ticker-text');
-            t.style.animation = 'none';
-            t.innerText = txt + " ... " + txt;
-            t.offsetHeight; /* trigger reflow */
-            t.style.animation = 'scroll 20s linear infinite';
-        }
-
     </script>
 </body>
 </html>
