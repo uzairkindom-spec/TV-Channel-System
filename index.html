@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DB News - Master Control Room</title>
+    <style>
+        :root {
+            --brand-red: #d32f2f; /* DB News Red */
+            --brand-dark: #0a0a0a;
+            --brand-gray: #212121;
+            --text-light: #ffffff;
+            --highlight: #fbc02d; /* For breaking news text */
+        }
+
+        body {
+            background-color: var(--brand-dark);
+            color: var(--text-light);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Top Header --- */
+        .header {
+            background: var(--brand-gray);
+            padding: 10px 20px;
+            border-bottom: 3px solid var(--brand-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-box {
+            display: flex;
+            align-items: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+        }
+        .logo-db {
+            background: var(--brand-red);
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px 0 0 4px;
+        }
+        .logo-news {
+            background: white;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        .live-clock {
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            color: var(--highlight);
+        }
+
+        /* --- Main Dashboard --- */
+        .dashboard {
+            display: flex;
+            flex: 1;
+            padding: 15px;
+            gap: 15px;
+            height: calc(100% - 100px); /* Reserve space for ticker */
+        }
+
+        /* Left: Rundown */
+        .rundown-panel {
+            width: 25%;
+            background: #161616;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-title {
+            background: #333;
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .rundown-list {
+            overflow-y: auto;
+            flex: 1;
+        }
+        .rundown-item {
+            padding: 12px;
+            border-bottom: 1px solid #2a2a2a;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        .rundown-item:hover { background: #222; }
+        .rundown-item.active { background: #3a1010; border-left: 4px solid var(--brand-red); }
+        .rundown-item.preview { background: #102a10; border-left: 4px solid green; }
+
+        /* Center: Monitors */
+        .monitors-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .monitor-wrapper {
+            display: flex;
+            gap: 15px;
+            height: 55%;
+        }
+        .monitor {
+            flex: 1;
+            background: black;
+            border: 2px solid #444;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .monitor.pgm { border-color: var(--brand-red); box-shadow: 0 0 15px rgba(211, 47, 47, 0.3); }
+        .monitor.pvw { border-color: green; }
+        
+        .monitor-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            color: #aaa;
+            z-index: 10;
+        }
+
+        /* On Screen Graphics Simulation */
+        .gfx-layer {
+            position: absolute;
+            bottom: 10%;
+            left: 5%;
+            width: 90%;
+            display: none; /* Hidden initially */
+        }
+        .gfx-headline {
+            background: linear-gradient(90deg, var(--brand-red) 0%, #8b0000 100%);
+            color: white;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .gfx-subline {
+            background: rgba(255,255,255,0.9);
+            color: black;
+            padding: 5px 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .live-bug {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--brand-red);
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+            display: none;
+        }
+
+        /* CG Controls */
+        .cg-controls {
+            background: #161616;
+            padding: 15px;
+            border: 1px solid #333;
+            flex: 1;
+        }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+        }
+        .btn-gfx {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .btn-gfx.active { background: var(--brand-red); }
+
+        /* Right: Master Controls */
+        .controls-panel {
+            width: 25%;
+            background: #161616;
+            padding: 15px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .big-btn {
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        .btn-cut { background: var(--brand-red); color: white; }
+        .btn-break { background: #ff9800; color: black; }
+        
+        /* --- Bottom Ticker --- */
+        .news-ticker {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--brand-red);
+            color: white;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .ticker-label {
+            background: black;
+            color: var(--highlight);
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-weight: 900;
+            text-transform: uppercase;
+            z-index: 101;
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker-scroll 20s linear infinite;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .screen-text { font-size: 2rem; color: #555; font-weight: bold; }
+        .pgm .screen-text { color: white; }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-box">
+            <div class="logo-db">DB</div>
+            <div class="logo-news">NEWS</div>
+        </div>
+        <div class="live-clock" id="clock">12:00:00</div>
+    </header>
+
+    <div class="dashboard">
+        
+        <aside class="rundown-panel">
+            <div class="panel-title">News Rundown (Playlist)</div>
+            <div class="rundown-list" id="rundown">
+                </div>
+        </aside>
+
+        <section class="monitors-panel">
+            <div class="monitor-wrapper">
+                <div class="monitor pvw">
+                    <div class="monitor-tag">PVW (Next)</div>
+                    <div class="screen-text" id="pvw-screen">WAITING...</div>
+                </div>
+                <div class="monitor pgm">
+                    <div class="monitor-tag">PGM (On Air)</div>
+                    <div class="live-bug" id="live-bug">LIVE</div>
+                    <div class="screen-text" id="pgm-screen">BLACK</div>
+                    
+                    <div class="gfx-layer" id="pgm-gfx">
+                        <div class="gfx-headline" id="gfx-head-display">HEADLINE TEXT HERE</div>
+                        <div class="gfx-subline" id="gfx-sub-display">Reporting live from Islamabad</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cg-controls">
+                <div class="panel-title">CG / Lower Third Controller</div>
+                <div class="input-group">
+                    <label>Headline</label>
+                    <input type="text" id="inp-headline" value="BREAKING NEWS: DB NEWS SYSTEM LAUNCHED">
+                </div>
+                <div class="input-group">
+                    <label>Sub-Headline / Location</label>
+                    <input type="text" id="inp-sub" value="ISLAMABAD STUDIO">
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn-gfx" onclick="updateGFX()">UPDATE TEXT</button>
+                    <button class="btn-gfx" onclick="toggleGFX()" id="btn-toggle-gfx">SHOW GFX</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="controls-panel">
+            <div class="panel-title">Master Switcher</div>
+            <button class="big-btn btn-cut" onclick="take()">TAKE</button>
+            <button class="big-btn btn-break" onclick="playBreak()">COMMERCIAL BREAK</button>
+            
+            <div style="margin-top: auto;">
+                <div class="panel-title">Ticker Control</div>
+                <textarea id="ticker-input" style="width:100%; background:#222; color:white; border:1px solid #444;" rows="3">PRIME MINISTER TO VISIT LAHORE TODAY *** GOLD PRICES DROP BY 500 RUPEES *** WEATHER UPDATE: HEAVY RAIN EXPECTED IN KARACHI *** DB NEWS EXCLUSIVE COVERAGE</textarea>
+                <button class="btn-gfx" style="width:100%; margin-top:5px;" onclick="updateTicker()">UPDATE TICKER</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <div class="news-ticker">
+        <div class="ticker-label">BREAKING NEWS</div>
+        <div class="ticker-content" id="ticker-text">
+            WELCOME TO DB NEWS - THE NUMBER ONE NEWS CHANNEL - LIVE UPDATES 24/7...
+        </div>
+    </div>
+
+    <script>
+        // 1. Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        // 2. Data
+        const newsItems = [
+            { id: 1, title: "Opener: DB News Theme", type: "INTRO" },
+            { id: 2, title: "Headlines: 9 PM", type: "PKG" },
+            { id: 3, title: "Live: Parliament House", type: "LIVE" },
+            { id: 4, title: "Report: Petrol Prices", type: "PKG" },
+            { id: 5, title: "Graphic: Economy Stats", type: "GFX" },
+            { id: 6, title: "SOT: Public Opinion", type: "SOT" },
+            { id: 7, title: "Teaser: 10 PM Show", type: "PROMO" },
+        ];
+
+        let currentIndex = -1;
+        const rundownDiv = document.getElementById('rundown');
+
+        // 3. Render Rundown
+        function renderRundown() {
+            rundownDiv.innerHTML = '';
+            newsItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `rundown-item ${index === currentIndex ? 'active' : ''} ${index === currentIndex + 1 ? 'preview' : ''}`;
+                div.innerHTML = `
+                    <span style="font-weight:bold;">${index+1}. ${item.title}</span>
+                    <span style="font-size:0.8em; background:#444; padding:2px 5px; border-radius:3px;">${item.type}</span>
+                `;
+                rundownDiv.appendChild(div);
+            });
+        }
+
+        // 4. TAKE Function (Switching)
+        function take() {
+            if (currentIndex < newsItems.length - 1) {
+                currentIndex++;
+                
+                // Update Screens
+                const currentItem = newsItems[currentIndex];
+                const nextItem = newsItems[currentIndex + 1];
+
+                document.getElementById('pgm-screen').innerText = currentItem.title;
+                document.getElementById('pvw-screen').innerText = nextItem ? nextItem.title : "END OF RUNDOWN";
+
+                // Logic for LIVE bug
+                const liveBug = document.getElementById('live-bug');
+                if (currentItem.type === "LIVE") {
+                    liveBug.style.display = "block";
+                } else {
+                    liveBug.style.display = "none";
+                }
+
+                renderRundown();
+            }
+        }
+
+        // 5. Commercial Break Shortcut
+        function playBreak() {
+            document.getElementById('pgm-screen').innerText = "*** COMMERCIAL BREAK ***";
+            document.getElementById('pgm-screen').style.color = "yellow";
+            document.getElementById('live-bug').style.display = "none";
+            document.getElementById('pgm-gfx').style.display = "none";
+        }
+
+        // 6. Graphics / Lower Thirds Logic
+        let gfxVisible = false;
+        function toggleGFX() {
+            const gfxLayer = document.getElementById('pgm-gfx');
+            const btn = document.getElementById('btn-toggle-gfx');
+            
+            if (!gfxVisible) {
+                gfxLayer.style.display = "block";
+                btn.classList.add('active');
+                btn.innerText = "HIDE GFX";
+                gfxVisible = true;
+            } else {
+                gfxLayer.style.display = "none";
+                btn.classList.remove('active');
+                btn.innerText = "SHOW GFX";
+                gfxVisible = false;
+            }
+        }
+
+        function updateGFX() {
+            const head = document.getElementById('inp-headline').value;
+            const sub = document.getElementById('inp-sub').value;
+            
+            document.getElementById('gfx-head-display').innerText = head;
+            document.getElementById('gfx-sub-display').innerText = sub;
+        }
+
+        // 7. Ticker Logic
+        function updateTicker() {
+            const newText = document.getElementById('ticker-input').value;
+            // Reset animation to make update visible immediately
+            const tickerDiv = document.getElementById('ticker-text');
+            tickerDiv.innerText = newText + " ... " + newText; 
+        }
+
+        // Init
+        renderRundown();
+
+    </script>
+</body>
+</html>
