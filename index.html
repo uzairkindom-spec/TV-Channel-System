@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV News Control System</title>
+    <title>TV News Control System - C9 UZAIR</title>
     <style>
         body {
             margin: 0;
@@ -20,8 +20,8 @@
         .tv-container {
             position: relative;
             width: 100%;
-            max-width: 1000px; /* Adjust size based on screen */
-            aspect-ratio: 16/9; /* Standard TV ratio */
+            max-width: 1000px;
+            aspect-ratio: 16/9;
             margin-top: 20px;
             background-color: #000;
             overflow: hidden;
@@ -35,11 +35,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10; /* Frame sits on top of videos but below controls */
-            pointer-events: none; /* Allows clicking through the transparent parts */
+            z-index: 10;
+            pointer-events: none; /* Clicks go through transparent parts */
         }
 
-        /* Screen Areas (Where videos play) */
+        /* Screen Areas */
         .screen-slot {
             position: absolute;
             background-color: #333;
@@ -52,7 +52,7 @@
             font-size: 14px;
             text-align: center;
             border: 2px dashed #555;
-            z-index: 5; /* Below the frame */
+            z-index: 5;
         }
 
         .screen-slot:hover {
@@ -66,7 +66,7 @@
             object-fit: cover;
         }
 
-        /* Positioning the Screens (Adjust these % based on your exact PNG) */
+        /* Positioning - Adjusted based on standard layout */
         #screen1 {
             top: 19%;
             left: 9%;
@@ -81,7 +81,7 @@
             height: 53%;
         }
 
-        /* Text Overlays (Headlines) */
+        /* Text Overlays */
         .text-layer {
             position: absolute;
             z-index: 12;
@@ -93,8 +93,8 @@
             bottom: 18%; 
             left: 12%;
             width: 60%;
-            font-size: 2.5vw; /* Responsive font size */
-            color: #003366; /* Dark Blue text like sample */
+            font-size: 2.5vw;
+            color: #003366;
             background: rgba(255, 255, 255, 0.9);
             padding: 2px 10px;
         }
@@ -129,7 +129,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        /* Control Popup (Modal) */
+        /* Modal Popup */
         .modal {
             display: none;
             position: fixed;
@@ -167,75 +167,64 @@
 
         .save-btn { background-color: #2ecc71; color: white; border: none; }
         .close-btn { background-color: #95a5a6; color: white; border: none; }
-
     </style>
 </head>
 <body>
 
     <div class="tv-container">
-        <img src="frame.png" class="frame-overlay" alt="News Frame">
+        <img src="IMG_0908.png" class="frame-overlay" alt="TV Frame Overlay">
 
         <div id="screen1" class="screen-slot" onclick="triggerUpload('file1')">
-            <span>Click to Upload<br>(Screen 1)</span>
+            <span>Upload Screen 1</span>
         </div>
         
         <div id="screen2" class="screen-slot" onclick="triggerUpload('file2')">
-            <span>Click to Upload<br>(Screen 2)</span>
+            <span>Upload Screen 2</span>
         </div>
 
         <div id="display-headline" class="text-layer">BREAKING NEWS</div>
-        <div id="display-subheadline" class="text-layer">UNSC HOLDS CRUCIAL VOTE ON TRUMP'S GAZA PEACE PLAN TODAY</div>
-        <div id="display-location" class="text-layer">DUBAI / 20:03</div>
+        <div id="display-subheadline" class="text-layer">LIVE UPDATES: SYSTEM ONLINE</div>
+        <div id="display-location" class="text-layer">ISLAMABAD / 21:00</div>
     </div>
 
     <input type="file" id="file1" accept="image/*,video/*" style="display: none;" onchange="handleFile(this, 'screen1')">
     <input type="file" id="file2" accept="image/*,video/*" style="display: none;" onchange="handleFile(this, 'screen2')">
 
-    <button class="control-btn" onclick="openModal()">Open Control Panel</button>
+    <button class="control-btn" onclick="openModal()">Control Panel</button>
 
     <div id="controlModal" class="modal">
         <div class="modal-content">
-            <h3>News Control System</h3>
-            
+            <h3>News Control</h3>
             <label>Main Headline:</label>
-            <input type="text" id="input-headline" placeholder="e.g., TRUMP'S GAZA PLAN">
-
-            <label>Sub Headline (Ticker):</label>
-            <input type="text" id="input-subheadline" placeholder="Details...">
-
+            <input type="text" id="input-headline">
+            <label>Sub Headline:</label>
+            <input type="text" id="input-subheadline">
             <label>Location / Time:</label>
-            <input type="text" id="input-location" placeholder="DUBAI / 20:00">
-
-            <button class="save-btn" onclick="updateText()">Update Screen</button>
-            <button class="close-btn" onclick="closeModal()">Close</button>
+            <input type="text" id="input-location">
+            <button class="save-btn" onclick="updateText()">Update</button>
+            <button class="close-btn" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <script>
-        // Function to open file dialog
         function triggerUpload(inputId) {
             document.getElementById(inputId).click();
         }
 
-        // Function to handle Image or Video upload
         function handleFile(input, screenId) {
             const file = input.files[0];
             if (file) {
                 const screen = document.getElementById(screenId);
                 const fileURL = URL.createObjectURL(file);
-                
-                screen.innerHTML = ""; // Clear previous content
-
+                screen.innerHTML = "";
                 if (file.type.startsWith('video/')) {
-                    // If it's a video
                     const video = document.createElement('video');
                     video.src = fileURL;
                     video.autoplay = true;
                     video.loop = true;
-                    video.muted = true; // Muted needed for autoplay
+                    video.muted = true;
                     screen.appendChild(video);
                 } else {
-                    // If it's an image
                     const img = document.createElement('img');
                     img.src = fileURL;
                     screen.appendChild(img);
@@ -243,10 +232,8 @@
             }
         }
 
-        // Modal Functions
         function openModal() {
             document.getElementById('controlModal').style.display = 'flex';
-            // Pre-fill inputs with current text
             document.getElementById('input-headline').value = document.getElementById('display-headline').innerText;
             document.getElementById('input-subheadline').value = document.getElementById('display-subheadline').innerText;
             document.getElementById('input-location').value = document.getElementById('display-location').innerText;
@@ -256,19 +243,12 @@
             document.getElementById('controlModal').style.display = 'none';
         }
 
-        // Update Text Function
         function updateText() {
-            const h = document.getElementById('input-headline').value;
-            const s = document.getElementById('input-subheadline').value;
-            const l = document.getElementById('input-location').value;
-
-            document.getElementById('display-headline').innerText = h;
-            document.getElementById('display-subheadline').innerText = s;
-            document.getElementById('display-location').innerText = l;
-
+            document.getElementById('display-headline').innerText = document.getElementById('input-headline').value;
+            document.getElementById('display-subheadline').innerText = document.getElementById('input-subheadline').value;
+            document.getElementById('display-location').innerText = document.getElementById('input-location').value;
             closeModal();
         }
     </script>
-
 </body>
 </html>
