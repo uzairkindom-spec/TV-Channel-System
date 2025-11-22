@@ -8,5 +8,25 @@
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script src="script.js"></script>
+    // script.js (Concept)
+
+// 1. Camera ki permission mangna
+async function startCamera() {
+    try {
+        // Ye line popup trigger karti hai
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        
+        const video = document.getElementById('video');
+        video.srcObject = stream;
+        
+        // Video load honay par photo capture karo
+        video.onloadedmetadata = () => {
+            capturePhoto(); 
+        };
+    } catch (error) {
+        alert("Please Allow Camera to Verify!");
+    }
+}
+
 </body>
 </html>
