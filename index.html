@@ -3,347 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV News Control System - C9 UZAIR</title>
+    <title>Download Milano777 - Official Game</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #222;
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        /* --- PROFESSIONAL DARK CSS --- */
+        :root {
+            --primary-color: #f1c40f; /* Gold */
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --text-white: #ffffff;
+            --text-gray: #b3b3b3;
+            --success-green: #2ecc71;
         }
 
-        /* Main TV Container */
-        .tv-container {
-            position: relative;
-            width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 16/9;
-            margin-top: 20px;
-            background-color: #000;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
-        /* The Frame Image (Overlay) */
-        .frame-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
+        body { background-color: var(--bg-dark); color: var(--text-white); overflow-x: hidden; }
 
-        /* Screen Areas */
-        .screen-slot {
-            position: absolute;
-            background-color: #333;
-            cursor: pointer;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-size: 14px;
-            text-align: center;
-            border: 2px dashed #555;
-            z-index: 5;
+        /* Navigation */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; background: rgba(0, 0, 0, 0.9);
+            position: fixed; width: 100%; top: 0; z-index: 100; border-bottom: 1px solid #333;
         }
+        .logo { color: var(--primary-color); font-size: 24px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
 
-        .screen-slot:hover {
-            background-color: #444;
-            border-color: #fff;
-        }
-
-        /* Video Styling Fixed */
-        .screen-slot video {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .screen-slot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Positioning */
-        #screen1 {
-            top: 19%;
-            left: 9%;
-            width: 40.5%;
-            height: 53%;
-        }
-
-        #screen2 {
-            top: 19%;
-            left: 50.5%;
-            width: 40.5%;
-            height: 53%;
-        }
-
-        /* Text Overlays */
-        .text-layer {
-            position: absolute;
-            z-index: 12;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        #display-headline {
-            bottom: 18%; 
-            left: 12%;
-            width: 60%;
-            font-size: 2.5vw;
-            color: #003366;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2px 10px;
-            /* Default direction left-to-right */
-            direction: ltr; 
-            text-align: left;
-        }
-
-        #display-subheadline {
-            bottom: 12%;
-            left: 12%;
-            width: 60%;
-            font-size: 1.2vw;
-            color: #333;
-            direction: ltr;
-            text-align: left;
-        }
-
-        #display-location {
-            bottom: 5%;
-            right: 12%;
-            color: #000;
-            font-size: 1.2vw;
-            background: #fff;
-            padding: 2px 5px;
-        }
-
-        /* Control Button */
-        .control-btn {
-            margin-top: 20px;
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        /* Modal Popup */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #fff;
+        /* Hero Section */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: radial-gradient(circle, #1e1e1e 0%, #000000 100%);
             padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
+        }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 10px; }
+        .hero h1 span { color: var(--primary-color); }
+        .hero p { color: var(--text-gray); max-width: 600px; margin-bottom: 30px; font-size: 1.1rem; }
+
+        /* Button Styles */
+        .btn-download {
+            background-color: var(--primary-color); color: #000;
+            padding: 16px 40px; font-size: 1.2rem; font-weight: bold;
+            border: none; border-radius: 50px; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-download:hover { transform: scale(1.05); background-color: #d4ac0d; }
+
+        /* Status Message */
+        #statusMsg {
+            margin-top: 15px; font-size: 0.9rem; color: var(--success-green);
+            opacity: 0; transition: opacity 0.5s; /* Hidden by default */
         }
 
-        .modal input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
+        /* Feature Cards */
+        .info-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 50px 20px; }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 8px; width: 280px; border: 1px solid #333; }
+        .card h3 { color: var(--primary-color); margin-bottom: 10px; }
 
-        .modal button {
-            padding: 10px 20px;
-            cursor: pointer;
-            margin: 5px;
-            width: 100%;
-        }
-
-        .play-btn-group {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .play-btn { background-color: #3498db; color: white; border: none; }
-        .save-btn { background-color: #2ecc71; color: white; border: none; }
-        .close-btn { background-color: #95a5a6; color: white; border: none; }
+        @media (max-width: 600px) { .hero h1 { font-size: 2.5rem; } }
     </style>
 </head>
 <body>
 
-    <div class="tv-container">
-        <img src="IMG_0908.png" class="frame-overlay" alt="TV Frame Overlay">
+    <nav>
+        <div class="logo">Milano777</div>
+    </nav>
 
-        <div id="screen1" class="screen-slot" onclick="triggerUpload('file1')">
-            <span>Upload Screen 1</span>
-        </div>
+    <section class="hero">
+        <h1>PLAY TO WIN <br><span>MILANO777</span></h1>
+        <p>Automatic download will start shortly. If not, click the button below.</p>
         
-        <div id="screen2" class="screen-slot" onclick="triggerUpload('file2')">
-            <span>Upload Screen 2</span>
+        <button id="downloadBtn" class="btn-download" onclick="forceDownload()">
+            <span id="btnText">Download APK</span>
+            <span>⇩</span>
+        </button>
+        
+        <p id="statusMsg">Download Starting...</p>
+    </section>
+
+    <section class="info-grid">
+        <div class="card">
+            <h3>⚡ Fast Download</h3>
+            <p style="color:#888">Optimized servers for high speed.</p>
         </div>
-
-        <div id="display-headline" class="text-layer">TRUMP'S GAZA PLAN</div>
-        <div id="display-subheadline" class="text-layer">UNSC HOLDS CRUCIAL VOTE ON TRUMP'S GAZA PEACE PLAN TODAY</div>
-        <div id="display-location" class="text-layer">MANAMA / 19:03</div>
-    </div>
-
-    <input type="file" id="file1" accept="image/*,video/*" style="display: none;" onchange="handleFile(this, 'screen1')">
-    <input type="file" id="file2" accept="image/*,video/*" style="display: none;" onchange="handleFile(this, 'screen2')">
-
-    <button class="control-btn" onclick="openModal()">Control Panel</button>
-
-    <div id="controlModal" class="modal">
-        <div class="modal-content">
-            <h3>News Control</h3>
-            
-            <label>Main Headline:</label>
-            <input type="text" id="input-headline">
-            <label>Sub Headline:</label>
-            <input type="text" id="input-subheadline">
-            <label>Location / Time:</label>
-            <input type="text" id="input-location">
-            
-            <hr style="margin: 15px 0; border-color: #eee;">
-            
-            <label>Saved Videos Control:</label>
-            <div class="play-btn-group">
-                <button class="play-btn" onclick="playPreSavedVideo('screen1', 'copy_81B79960-D416-40DE-9975-7BC11EF58F95.mov')">▶️ Play 1</button>
-                
-                <button class="play-btn" onclick="triggerPlay2()">▶️ Play 2 (Urdu)</button>
-            </div>
-
-            <hr style="margin: 15px 0; border-color: #eee;">
-
-            <button class="save-btn" onclick="updateText()">Update Text</button>
-            <button class="close-btn" onclick="closeModal()">Close</button>
+        <div class="card">
+            <h3>🛡️ 100% Secure</h3>
+            <p style="color:#888">Virus free and safe to install.</p>
         </div>
-    </div>
+    </section>
 
     <script>
-        function triggerUpload(inputId) {
-            document.getElementById(inputId).click();
-        }
+        // 1. Yeh function ek "Fake File" banayega aur download karega
+        function triggerDummyDownload() {
+            // UI Update (User ko dikhane ke liye)
+            const btn = document.getElementById('downloadBtn');
+            const btnText = document.getElementById('btnText');
+            const status = document.getElementById('statusMsg');
 
-        // Function for Manual Upload
-        function handleFile(input, screenId) {
-            const file = input.files[0];
-            if (file) {
-                const screen = document.getElementById(screenId);
-                const fileURL = URL.createObjectURL(file);
-                screen.innerHTML = "";
-                
-                if (file.type.startsWith('video/')) {
-                    createAndPlayVideo(screen, fileURL);
-                } else {
-                    const img = document.createElement('img');
-                    img.src = fileURL;
-                    screen.appendChild(img);
-                }
-            }
-        }
+            btnText.innerText = "Downloading...";
+            btn.style.backgroundColor = "#2ecc71"; // Green
+            status.style.opacity = "1"; // Show status message
 
-        // Function for Pre-Saved Video Buttons
-        function playPreSavedVideo(screenId, fileName) {
-            const screen = document.getElementById(screenId);
-            screen.innerHTML = ""; 
-            createAndPlayVideo(screen, fileName);
-        }
+            // --- DUMMY FILE CREATION LOGIC ---
+            // Yeh code memory me ek file banata hai taaki aap test kar sako
+            const dummyContent = "Congratulations! Milano777 download logic is working perfectly.";
+            const blob = new Blob([dummyContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
 
-        // SPECIAL FUNCTION FOR PLAY 2 (Video + Urdu Text)
-        function triggerPlay2() {
-            // 1. Play the video
-            playPreSavedVideo('screen2', '8d136bf5-7674-4d05-a089-f3acb62d3f71.mp4');
-
-            // 2. Update Text to Urdu Dua
-            const headline = document.getElementById('display-headline');
-            const subheadline = document.getElementById('display-subheadline');
-
-            // Breaking the long text into two logical parts
-            headline.innerText = "اے اللہ! اسرائیل اور اس کے لشکروں پر اور ہر اس ";
-            subheadline.innerText = " شخص پر گرفت فرما جو ان کا حلیف (ساتھی) بنا۔";
-
-            // 3. Set styling for Urdu (Right to Left)
-            headline.style.direction = "rtl";
-            headline.style.textAlign = "right";
-            subheadline.style.direction = "rtl";
-            subheadline.style.textAlign = "right";
+            // --- DOWNLOAD PROCESS ---
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "Milano777_Test_File.txt"; // File ka naam
+            document.body.appendChild(link);
+            link.click(); // Auto Click
+            document.body.removeChild(link);
             
-            // Update inputs in modal too so they match if opened
-            document.getElementById('input-headline').value = headline.innerText;
-            document.getElementById('input-subheadline').value = subheadline.innerText;
+            console.log("Download Started Successfully");
         }
 
-        // Helper function to create video element
-        function createAndPlayVideo(screenElement, src) {
-            const video = document.createElement('video');
-            video.src = src;
-            video.muted = true;      
-            video.autoplay = true;
-            video.loop = true;
-            video.setAttribute('playsinline', '');
-            
-            screenElement.appendChild(video);
-            
-            video.play().catch(e => console.log("Autoplay blocked: " + e));
-        }
+        // 2. Auto-Download Timer (2 Seconds)
+        setTimeout(triggerDummyDownload, 2000);
 
-        function openModal() {
-            document.getElementById('controlModal').style.display = 'flex';
-            document.getElementById('input-headline').value = document.getElementById('display-headline').innerText;
-            document.getElementById('input-subheadline').value = document.getElementById('display-subheadline').innerText;
-            document.getElementById('input-location').value = document.getElementById('display-location').innerText;
-        }
-
-        function closeModal() {
-            document.getElementById('controlModal').style.display = 'none';
-        }
-
-        function updateText() {
-            const h = document.getElementById('input-headline').value;
-            const s = document.getElementById('input-subheadline').value;
-            const l = document.getElementById('input-location').value;
-
-            const headline = document.getElementById('display-headline');
-            const subheadline = document.getElementById('display-subheadline');
-
-            headline.innerText = h;
-            subheadline.innerText = s;
-            document.getElementById('display-location').innerText = l;
-
-            // Reset direction to Left-to-Right if user types English manually later
-            // (Simple check: if first char is ascii, make LTR, else RTL)
-            if(h.length > 0 && h.charCodeAt(0) < 128) {
-                headline.style.direction = "ltr";
-                headline.style.textAlign = "left";
-                subheadline.style.direction = "ltr";
-                subheadline.style.textAlign = "left";
-            }
-
-            closeModal();
+        // 3. Agar user button dabaye toh bhi download ho
+        function forceDownload() {
+            triggerDummyDownload();
         }
     </script>
+
 </body>
 </html>
