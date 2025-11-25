@@ -1,80 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <title>News Reporter Camera</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000; /* Black background taa k extra hissa kala rahe */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden; /* Scroll band karne k liye */
-            font-family: Arial, sans-serif;
-        }
-
-        /* Main Container */
-        .news-frame-container {
-            position: relative;
-            width: 100%;
-            max-width: 1024px; /* iPad landscape k hisab se max width */
-            aspect-ratio: 16/9; /* Video ka size TV jesa rakhne k liye */
-        }
-
-        /* Frame Image (Jo ab sabse UPAR rahega) */
-        #frame-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10; /* Ye video k UPAR rahega */
-            pointer-events: none;
-            object-fit: fill;
-        }
-
-        /* Camera Video (Jo ab PEECHE chalega) */
-        #webcam {
-            position: absolute;
-            /* Agar apka frame full transparent hai beech me se, to ye full size rakhein */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            
-            object-fit: cover;
-            background-color: black;
-            z-index: 1; /* Ye frame k PEECHE rahega */
-        }
-
-        /* Note: Agar video abhi bhi frame k uper match nahi ho rahi, 
-           to uper #webcam ki top/left values change karein */
-    </style>
-</head>
-<body>
-
-    <div class="news-frame-container">
-        <img src="IMG_1151.png" alt="News Frame" id="frame-img">
-        
-        <video id="webcam" autoplay playsinline muted></video>
-    </div>
-
     <script>
         async function startCamera() {
             const videoElement = document.getElementById('webcam');
 
             try {
-                // 'facingMode: user' ka matlab front camera
-                // 'facingMode: environment' ka matlab back camera
+                // 'facingMode: user' ka matlab Front (Selfie) Camera
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, 
+                    video: { facingMode: 'user' }, 
                     audio: false 
                 });
                 videoElement.srcObject = stream;
@@ -86,6 +17,3 @@
 
         window.addEventListener('load', startCamera);
     </script>
-
-</body>
-</html>
